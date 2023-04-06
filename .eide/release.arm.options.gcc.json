@@ -1,0 +1,28 @@
+{
+    "version": 4,
+    "beforeBuildTasks": [],
+    "afterBuildTasks": [],
+    "global": {
+        "$float-abi-type": "hard",
+        "output-debug-info": "enable"
+    },
+    "c/cpp-compiler": {
+        "language-c": "c17",
+        "language-cpp": "gnu++17",
+        "optimization": "level-3",
+        "warnings": "all-warnings",
+        "one-elf-section-per-function": true,
+        "one-elf-section-per-data": true,
+        "C_FLAGS": "-fno-exceptions -pipe",
+        "CXX_FLAGS": "-fno-rtti -fno-threadsafe-statics"
+    },
+    "asm-compiler": {
+        "ASM_FLAGS": "-ffunction-sections -fdata-sections"
+    },
+    "linker": {
+        "output-format": "elf",
+        "remove-unused-input-sections": true,
+        "LD_FLAGS": "--specs=nosys.specs --specs=nano.specs",
+        "LIB_FLAGS": "-lm -lstdc++"
+    }
+}

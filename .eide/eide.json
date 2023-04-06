@@ -1,0 +1,88 @@
+{
+  "name": "wtr-joystick-air",
+  "type": "ARM",
+  "dependenceList": [],
+  "srcDirs": [
+    ".eide/deps",
+    "UserCode",
+    "CubeMX/Core",
+    "CubeMX/Drivers",
+    "CubeMX/Middlewares",
+    "CubeMX/STM32CubeIDE"
+  ],
+  "virtualFolder": {
+    "name": "<virtual_root>",
+    "files": [],
+    "folders": []
+  },
+  "outDir": "build",
+  "deviceName": null,
+  "packDir": null,
+  "miscInfo": {
+    "uid": "c8810526060a5ff47af226de28ead8dc"
+  },
+  "targets": {
+    "Debug": {
+      "excludeList": [],
+      "toolchain": "GCC",
+      "compileConfig": {
+        "cpuType": "Cortex-M7",
+        "floatingPointHardware": "double",
+        "scatterFilePath": "CubeMX/STM32CubeIDE/STM32H743VITX_FLASH.ld",
+        "useCustomScatterFile": true,
+        "storageLayout": {
+          "RAM": [],
+          "ROM": []
+        },
+        "options": "null"
+      },
+      "uploader": "STLink",
+      "uploadConfig": {
+        "bin": "",
+        "proType": "SWD",
+        "resetMode": "default",
+        "runAfterProgram": true,
+        "speed": 4000,
+        "address": "0x08000000",
+        "elFile": "None",
+        "optionBytes": ".eide/debug.st.option.bytes.ini",
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {
+        "JLink": {
+          "bin": "",
+          "baseAddr": "",
+          "cpuInfo": {
+            "vendor": "null",
+            "cpuName": "null"
+          },
+          "proType": 1,
+          "speed": 8000,
+          "otherCmds": ""
+        }
+      },
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          ".eide/deps",
+          "CubeMX/Core/Inc",
+          "CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc",
+          "CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy",
+          "CubeMX/Middlewares/Third_Party/FreeRTOS/Source/include",
+          "CubeMX/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS",
+          "CubeMX/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F",
+          "CubeMX/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
+          "CubeMX/Drivers/CMSIS/Include",
+          "CubeMX/STM32CubeIDE/Application/User/ThreadSafe"
+        ],
+        "libList": [],
+        "sourceDirList": [],
+        "defineList": [
+          "USE_HAL_DRIVER",
+          "STM32H743xx"
+        ]
+      }
+    }
+  },
+  "version": "3.3"
+}
