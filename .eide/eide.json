@@ -80,7 +80,8 @@
         "sourceDirList": [],
         "defineList": [
           "USE_HAL_DRIVER",
-          "STM32H743xx"
+          "STM32H743xx",
+          "STM32_THREAD_SAFE_STRATEGY=4"
         ]
       }
     }
