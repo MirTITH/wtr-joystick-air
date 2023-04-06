@@ -5,10 +5,7 @@
   "srcDirs": [
     ".eide/deps",
     "UserCode",
-    "CubeMX/Core",
-    "CubeMX/Drivers",
-    "CubeMX/Middlewares",
-    "CubeMX/STM32CubeIDE"
+    "CubeMX"
   ],
   "virtualFolder": {
     "name": "<virtual_root>",
@@ -28,7 +25,7 @@
       "compileConfig": {
         "cpuType": "Cortex-M7",
         "floatingPointHardware": "double",
-        "scatterFilePath": "CubeMX/STM32CubeIDE/STM32H743VITX_FLASH.ld",
+        "scatterFilePath": "UserCode/STM32H743VITX_FLASH_Customed.ld",
         "useCustomScatterFile": true,
         "storageLayout": {
           "RAM": [],
@@ -73,7 +70,11 @@
           "CubeMX/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F",
           "CubeMX/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
           "CubeMX/Drivers/CMSIS/Include",
-          "CubeMX/STM32CubeIDE/Application/User/ThreadSafe"
+          "CubeMX/STM32CubeIDE/Application/User/ThreadSafe",
+          "CubeMX/USB_DEVICE/App",
+          "CubeMX/USB_DEVICE/Target",
+          "CubeMX/Middlewares/ST/STM32_USB_Device_Library/Core/Inc",
+          "CubeMX/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc"
         ],
         "libList": [],
         "sourceDirList": [],

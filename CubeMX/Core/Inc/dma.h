@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    sdmmc.h
+  * @file    dma.h
   * @brief   This file contains all the function prototypes for
-  *          the sdmmc.c file
+  *          the dma.c file
   ******************************************************************************
   * @attention
   *
@@ -18,8 +18,8 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __SDMMC_H__
-#define __SDMMC_H__
+#ifndef __DMA_H__
+#define __DMA_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,17 +28,18 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+/* DMA memory to memory transfer handles -------------------------------------*/
+extern DMA_HandleTypeDef hdma_memtomem_dma1_stream0;
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
-
-extern SD_HandleTypeDef hsd1;
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_SDMMC1_SD_Init(void);
+void MX_DMA_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -48,5 +49,5 @@ void MX_SDMMC1_SD_Init(void);
 }
 #endif
 
-#endif /* __SDMMC_H__ */
+#endif /* __DMA_H__ */
 
