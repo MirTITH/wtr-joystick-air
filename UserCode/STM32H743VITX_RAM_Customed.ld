@@ -1,12 +1,12 @@
 /*
 ******************************************************************************
 **
-**  File        : LinkerScript.ld
+**  File        : LinkerScript.ld (debug in RAM dedicated)
 **
 **  Author      : STM32CubeIDE
 **
 **  Abstract    : Linker script for STM32H7 series
-**                2048Kbytes FLASH and 1056Kbytes RAM
+**                512Kbytes RAM_EXEC and 544Kbytes RAM
 **
 **                Set heap size, stack size and stack location according
 **                to application requirements.
@@ -35,94 +35,33 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = ORIGIN(RAM_D1) + LENGTH(RAM_D1);    /* end of RAM */
+_estack = ORIGIN(DTCMRAM) + LENGTH(DTCMRAM);    /* end of RAM */
 /* Generate a link error if heap and stack don't fit into RAM */
-_Min_Heap_Size = 0x500;      /* required amount of heap  */
+_Min_Heap_Size = 0x1000;      /* required amount of heap  */
 _Min_Stack_Size = 0x1000; /* required amount of stack */
 
 /* Specify the memory areas */
 MEMORY
 {
-  FLASH (rx)     : ORIGIN = 0x08000000, LENGTH = 2048K
-  DTCMRAM (xrw)  : ORIGIN = 0x20000000, LENGTH = 128K
-  RAM_D1 (xrw)   : ORIGIN = 0x24000000, LENGTH = 512K
-  RAM_D2 (xrw)   : ORIGIN = 0x30000000, LENGTH = 288K
-  RAM_D3 (xrw)   : ORIGIN = 0x38000000, LENGTH = 64K
-  ITCMRAM (xrw)  : ORIGIN = 0x00000000, LENGTH = 64K
+  RAM_EXEC (xrw)  : ORIGIN = 0x24000000, LENGTH = 512K
+  DTCMRAM (xrw)   : ORIGIN = 0x20000000, LENGTH = 128K
+  RAM_D2 (xrw)    : ORIGIN = 0x30000000, LENGTH = 288K
+  RAM_D3 (xrw)    : ORIGIN = 0x38000000, LENGTH = 64K
+  ITCMRAM (xrw)   : ORIGIN = 0x00000000, LENGTH = 64K
 }
 
 /* Define output sections */
 SECTIONS
 {
-  /* The startup code goes first into FLASH */
+  /* The startup code goes first into RAM_EXEC */
   .isr_vector :
   {
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
-  } >FLASH
+  } >RAM_EXEC
 
-  .itcmram :
-  {
-    . = . + 1;       /* itcmram 从 0x0 开始，由于这个地址有特殊意义，所以不使用这个地址 */
-    . = ALIGN(4);
-    _sbss_itcm = .;         /* define a global symbol at itcmram bss start */
-
-    *(.bss.itcmram*)
-
-    . = ALIGN(4);
-    _ebss_itcm = .;         /* define a global symbol at itcmram bss end */
-  } >ITCMRAM
-
-  .dtcmram :
-  {
-    . = ALIGN(4);
-    _sbss_dtcm = .;         /* define a global symbol at dtcmram bss start */
-
-    *(.bss.dtcmram*)
-    *heap_4.o(.bss.ucHeap*) /* FreeRTOS 的内存池 */
-
-    . = ALIGN(4);
-    _ebss_dtcm = .;         /* define a global symbol at dtcmram bss end */
-  } >DTCMRAM
-
-  .ram_d1 :
-  {
-    . = ALIGN(4);
-    _sbss_d1 = .;         /* define a global symbol at ram_d1 bss start */
-
-    *(.bss.ram_d1*)
-
-    . = ALIGN(4);
-    _ebss_d1 = .;         /* define a global symbol at ram_d1 bss end */
-  } >RAM_D1
-
-  .ram_d2 :
-  {
-    . = ALIGN(4);
-    _sbss_d2 = .;         /* define a global symbol at ram_d2 bss start */
-
-    *(.bss.ram_d2*)
-    /* *lv_mem.o(.bss.work_mem_int*) */
-    *lv_port_disp.o(.bss.*buf_1*)
-    *lv_port_disp.o(.bss.*buf_2*)
-
-    . = ALIGN(4);
-    _ebss_d2 = .;         /* define a global symbol at ram_d2 bss end */
-  } >RAM_D2
-
-  .ram_d3 :
-  {
-    . = ALIGN(4);
-    _sbss_d3 = .;         /* define a global symbol at ram_d3 bss start */
-
-    *(.bss.ram_d3*)
-
-    . = ALIGN(4);
-    _ebss_d3 = .;         /* define a global symbol at ram_d3 bss end */
-  } >RAM_D3
-
-  /* The program code and other data goes into FLASH */
+  /* The program code and other data goes into RAM_EXEC */
   .text :
   {
     . = ALIGN(4);
@@ -131,36 +70,38 @@ SECTIONS
     *(.glue_7)         /* glue arm to thumb code */
     *(.glue_7t)        /* glue thumb to arm code */
     *(.eh_frame)
+    *(.RamFunc)        /* .RamFunc sections */
+    *(.RamFunc*)       /* .RamFunc* sections */
 
     KEEP (*(.init))
     KEEP (*(.fini))
 
     . = ALIGN(4);
     _etext = .;        /* define a global symbols at end of code */
-  } >FLASH
+  } >RAM_EXEC
 
-  /* Constant data goes into FLASH */
+  /* Constant data goes into RAM_EXEC */
   .rodata :
   {
     . = ALIGN(4);
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
     . = ALIGN(4);
-  } >FLASH
+  } >RAM_EXEC
 
-  .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
+  .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >RAM_EXEC
   .ARM : {
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
-  } >FLASH
+  } >RAM_EXEC
 
   .preinit_array     :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } >FLASH
+  } >RAM_EXEC
 
   .init_array :
   {
@@ -168,7 +109,7 @@ SECTIONS
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } >FLASH
+  } >RAM_EXEC
 
   .fini_array :
   {
@@ -176,7 +117,7 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } >FLASH
+  } >RAM_EXEC
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
@@ -188,12 +129,21 @@ SECTIONS
     _sdata = .;        /* create a global symbol at data start */
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
-    *(.RamFunc)        /* .RamFunc sections */
-    *(.RamFunc*)       /* .RamFunc* sections */
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
-  } >RAM_D1 AT> FLASH
+  } >DTCMRAM AT> RAM_EXEC
+
+  .ram_d2 :
+  {
+    . = ALIGN(4);
+    _sbss_ram_d2 = .;         /* define a global symbol at bss start */
+
+    *heap_4.o(.bss.ucHeap*)
+
+    . = ALIGN(4);
+    _ebss_ram_d2 = .;         /* define a global symbol at bss end */
+  } >RAM_D2
 
   /* Uninitialized data section */
   . = ALIGN(4);
@@ -209,7 +159,7 @@ SECTIONS
     . = ALIGN(4);
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
-  } >RAM_D1
+  } >DTCMRAM
 
   /* User_heap_stack section, used to check that there is enough RAM left */
   ._user_heap_stack :
@@ -220,7 +170,7 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
-  } >RAM_D1
+  } >DTCMRAM
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
@@ -232,5 +182,3 @@ SECTIONS
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
-
-

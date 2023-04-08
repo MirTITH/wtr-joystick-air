@@ -13,3 +13,6 @@
 # eide template
 *.ept
 *.eide-template
+
+# user defined
+/.pack

@@ -13,14 +13,16 @@
     "folders": []
   },
   "outDir": "build",
-  "deviceName": null,
-  "packDir": null,
+  "deviceName": "STM32H743VITx",
+  "packDir": ".pack/Keil/STM32H7xx_DFP.2.3.1",
   "miscInfo": {
     "uid": "c8810526060a5ff47af226de28ead8dc"
   },
   "targets": {
     "Debug": {
-      "excludeList": [],
+      "excludeList": [
+        "CubeMX/STM32CubeIDE/Application/User/Startup/startup_stm32h743vitx.s"
+      ],
       "toolchain": "GCC",
       "compileConfig": {
         "cpuType": "Cortex-M7",
@@ -56,6 +58,30 @@
           "proType": 1,
           "speed": 8000,
           "otherCmds": ""
+        },
+        "STLink": {
+          "bin": "",
+          "proType": "SWD",
+          "resetMode": "default",
+          "runAfterProgram": true,
+          "speed": 4000,
+          "address": "0x08000000",
+          "elFile": "None",
+          "optionBytes": ".eide/debug.st.option.bytes.ini",
+          "otherCmds": ""
+        },
+        "pyOCD": {
+          "bin": "",
+          "targetName": "stm32h743vitx",
+          "baseAddr": "0x08000000",
+          "speed": "4M",
+          "config": ".eide/debug.pyocd.yaml"
+        },
+        "OpenOCD": {
+          "bin": "",
+          "target": "stm32h7x",
+          "interface": "stlink",
+          "baseAddr": "0x08000000"
         }
       },
       "custom_dep": {
