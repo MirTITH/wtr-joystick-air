@@ -4,11 +4,23 @@
 
 using namespace std;
 
-void StartDefaultTask(void *argument)
+int TestValue = 0;
+
+__attribute__((section(".itcmram"))) int TestTask(int value)
+{
+    if (value > 5) {
+        value--;
+    } else {
+        value++;
+    }
+    return value;
+}
+
+__attribute__((section(".itcmram"))) void StartDefaultTask(void *argument)
 {
     (void)argument;
-
     while (true) {
+        TestValue = TestTask(TestValue);
         vTaskDelay(1);
     }
 }

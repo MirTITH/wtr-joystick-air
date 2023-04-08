@@ -37,7 +37,7 @@ ENTRY(Reset_Handler)
 /* Highest address of the user mode stack */
 _estack = ORIGIN(RAM_D1) + LENGTH(RAM_D1);    /* end of RAM */
 /* Generate a link error if heap and stack don't fit into RAM */
-_Min_Heap_Size = 0x500;      /* required amount of heap  */
+_Min_Heap_Size = 0x1000;      /* required amount of heap  */
 _Min_Stack_Size = 0x1000; /* required amount of stack */
 
 /* Specify the memory areas */
@@ -62,7 +62,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .itcmram :
+  .itcmram_bss :
   {
     . = . + 1;       /* itcmram 从 0x0 开始，由于这个地址有特殊意义，所以不使用这个地址 */
     . = ALIGN(4);
@@ -73,6 +73,16 @@ SECTIONS
     . = ALIGN(4);
     _ebss_itcm = .;         /* define a global symbol at itcmram bss end */
   } >ITCMRAM
+
+  _sidata_itcm = LOADADDR(.itcmram_data_text);
+  .itcmram_data_text :
+  {
+    . = ALIGN(4);
+     _sdata_itcm = .; 
+    *(*.itcmram*)
+    . = ALIGN(4);
+    _edata_itcm = .;
+  } >ITCMRAM AT >FLASH
 
   .dtcmram :
   {

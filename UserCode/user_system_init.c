@@ -2,12 +2,21 @@
 
 /**
  * @brief 清理内存的函数
- * @param startPos 开始地址
- * @param endPos 结束地址
+ * @param start_pos 开始地址
+ * @param end_pos 结束地址
  */
-static void ClearMem(void *startPos, void *endPos)
+static void ClearMem(void *start_pos, void *end_pos)
 {
-    memset(startPos, 0, (size_t)endPos - (size_t)startPos);
+    memset(start_pos, 0, (size_t)end_pos - (size_t)start_pos);
+}
+
+/**
+ * @brief 将 FLASH 中的数据复制到内存中
+ *
+ */
+static void CopyData(void *sidata, void *sdata, void *edata)
+{
+    memcpy(sdata, sidata, (size_t)edata - (size_t)sdata);
 }
 
 /**
@@ -22,6 +31,7 @@ void __UserSystemInit()
     // __HAL_RCC_D2SRAM1_CLK_ENABLE();
     // __HAL_RCC_D2SRAM2_CLK_ENABLE();
     // __HAL_RCC_D2SRAM3_CLK_ENABLE();
+
     // 各区域bss段的开始结束地址（定义在 ld 文件中）
     extern size_t _sbss_d1, _sbss_d2, _sbss_d3, _sbss_itcm, _sbss_dtcm;
     extern size_t _ebss_d1, _ebss_d2, _ebss_d3, _ebss_itcm, _ebss_dtcm;
@@ -32,4 +42,7 @@ void __UserSystemInit()
     ClearMem(&_sbss_d3, &_ebss_d3);
     ClearMem(&_sbss_itcm, &_ebss_itcm);
     ClearMem(&_sbss_dtcm, &_ebss_dtcm);
+
+    extern size_t _sidata_itcm, _sdata_itcm, _edata_itcm;
+    CopyData(&_sidata_itcm, &_sdata_itcm, &_edata_itcm);
 }
