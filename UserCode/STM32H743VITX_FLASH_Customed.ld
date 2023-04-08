@@ -62,6 +62,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
+  /* itcmram */
   .itcmram_bss :
   {
     . = . + 1;       /* itcmram 从 0x0 开始，由于这个地址有特殊意义，所以不使用这个地址 */
@@ -79,24 +80,36 @@ SECTIONS
   {
     . = ALIGN(4);
      _sdata_itcm = .; 
-    *(*.itcmram*)
+    *(.itcmram*)
     . = ALIGN(4);
     _edata_itcm = .;
   } >ITCMRAM AT >FLASH
 
-  .dtcmram :
+  /* dtcmram */
+  .dtcmram_bss :
   {
     . = ALIGN(4);
     _sbss_dtcm = .;         /* define a global symbol at dtcmram bss start */
 
-    *(.bss.dtcmram*)
     *heap_4.o(.bss.ucHeap*) /* FreeRTOS 的内存池 */
+    *(.bss.dtcmram*)
 
     . = ALIGN(4);
     _ebss_dtcm = .;         /* define a global symbol at dtcmram bss end */
   } >DTCMRAM
 
-  .ram_d1 :
+  _sidata_dtcm = LOADADDR(.dtcmram_data_text);
+  .dtcmram_data_text :
+  {
+    . = ALIGN(4);
+     _sdata_dtcm = .; 
+    *(.dtcmram*)
+    . = ALIGN(4);
+    _edata_dtcm = .;
+  } >DTCMRAM AT >FLASH
+
+  /* ram_d1 */
+  .ram_d1_bss :
   {
     . = ALIGN(4);
     _sbss_d1 = .;         /* define a global symbol at ram_d1 bss start */
@@ -107,21 +120,42 @@ SECTIONS
     _ebss_d1 = .;         /* define a global symbol at ram_d1 bss end */
   } >RAM_D1
 
-  .ram_d2 :
+  _sidata_d1 = LOADADDR(.ram_d1_data_text);
+  .ram_d1_data_text :
+  {
+    . = ALIGN(4);
+     _sdata_d1 = .; 
+    *(.ram_d1*)
+    . = ALIGN(4);
+    _edata_d1 = .;
+  } >RAM_D1 AT >FLASH
+
+  /* ram_d2 */
+  .ram_d2_bss :
   {
     . = ALIGN(4);
     _sbss_d2 = .;         /* define a global symbol at ram_d2 bss start */
 
-    *(.bss.ram_d2*)
-    /* *lv_mem.o(.bss.work_mem_int*) */
     *lv_port_disp.o(.bss.*buf_1*)
     *lv_port_disp.o(.bss.*buf_2*)
+    *(.bss.ram_d2*)
 
     . = ALIGN(4);
     _ebss_d2 = .;         /* define a global symbol at ram_d2 bss end */
   } >RAM_D2
 
-  .ram_d3 :
+  _sidata_d2 = LOADADDR(.ram_d2_data_text);
+  .ram_d2_data_text :
+  {
+    . = ALIGN(4);
+     _sdata_d2 = .; 
+    *(.ram_d2*)
+    . = ALIGN(4);
+    _edata_d2 = .;
+  } >RAM_D2 AT >FLASH
+
+  /* ram_d3 */
+  .ram_d3_bss :
   {
     . = ALIGN(4);
     _sbss_d3 = .;         /* define a global symbol at ram_d3 bss start */
@@ -131,6 +165,16 @@ SECTIONS
     . = ALIGN(4);
     _ebss_d3 = .;         /* define a global symbol at ram_d3 bss end */
   } >RAM_D3
+
+  _sidata_d3 = LOADADDR(.ram_d3_data_text);
+  .ram_d3_data_text :
+  {
+    . = ALIGN(4);
+     _sdata_d3 = .; 
+    *(.ram_d3*)
+    . = ALIGN(4);
+    _edata_d3 = .;
+  } >RAM_D3 AT >FLASH
 
   /* The program code and other data goes into FLASH */
   .text :

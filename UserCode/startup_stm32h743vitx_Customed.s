@@ -93,7 +93,7 @@ LoopFillZerobss:
   cmp r2, r4
   bcc FillZerobss
 
-
+/* 调用用户定义的系统初始化函数 */
   bl __UserSystemInit
 /* Call static constructors */
   bl __libc_init_array
