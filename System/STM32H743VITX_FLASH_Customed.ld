@@ -79,8 +79,11 @@ SECTIONS
   .itcmram_data_text :
   {
     . = ALIGN(4);
-     _sdata_itcm = .; 
+     _sdata_itcm = .;
+
     *(.itcmram*)
+    *UserCode*.o(.text*) /* 路径里有 UserCode 的文件中的代码段 */
+
     . = ALIGN(4);
     _edata_itcm = .;
   } >ITCMRAM AT >FLASH
