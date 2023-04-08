@@ -6,17 +6,11 @@ using namespace std;
 
 int TestValue = 0;
 
-__attribute__((section(".itcmram"))) int TestTask(int value)
-{
-    value++;
-    return value;
-}
-
-__attribute__((section(".itcmram"))) void StartDefaultTask(void *argument)
+__attribute__((section(".itcmram"))) void StartDefaultTask(void const *argument)
 {
     (void)argument;
     while (true) {
-        TestValue = TestTask(TestValue);
+        TestValue++;
         vTaskDelay(1);
     }
 }

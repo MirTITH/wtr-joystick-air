@@ -4,13 +4,7 @@
 extern "C" {
 #endif
 
-/**
- * @brief 系统初始化，必须在使能MPU前调用
- *
- */
-void SysInit();
-
-void StartDefaultTask(void *argument);
+void StartDefaultTask(void const *argument);
 
 #ifdef __cplusplus
 }
