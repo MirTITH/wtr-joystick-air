@@ -2,9 +2,6 @@
 
 ## 计划
 ### 高优先级
-- [ ] DTCMRAM 的 MPU 配置
-- [ ] 尝试使用 ITCMRAM
-- [ ] 更好的 bss 段 初始化
 
 ### 低优先级
 - [ ] 完成摇杆驱动
@@ -16,11 +13,17 @@
 - [ ] 设置界面
 - [ ] 使用板载 Flash 芯片
 - [ ] 优化 ScreenConsole
+- [ ] 尝试使用 SD 卡
+- [ ] USB 多设备
 
 ### 已完成
-
+- [x] DTCMRAM 的 MPU 配置
+- [x] 尝试使用 ITCMRAM
+- [x] 更好的 bss 段 初始化
+- [x] FreeRTOS tickless idle 低功耗
 ## Bugs
 - [ ] SD 卡有时读取失败，f_mount 挂载失败，SDMMC_ERROR_DATA_TIMEOUT
     > 怀疑和温度有关，低温时出现  
     > 在 stm32h7xx_hal_sd.c:3386 处 return HAL_SD_ERROR_DATA_TIMEOUT;  
     > hsd1.Instance.STA = 0x101008
+    > 怀疑是引脚冲突
