@@ -8,11 +8,7 @@ int TestValue = 0;
 
 __attribute__((section(".itcmram"))) int TestTask(int value)
 {
-    if (value > 5) {
-        value--;
-    } else {
-        value++;
-    }
+    value++;
     return value;
 }
 

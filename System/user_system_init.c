@@ -1,22 +1,24 @@
-#include <string.h>
-
 /**
  * @brief 清理内存的函数
  * @param start_pos 开始地址
  * @param end_pos 结束地址
  */
-static void ClearMem(void *start_pos, void *end_pos)
+static void ClearMem(unsigned int *start_pos, unsigned int *end_pos)
 {
-    memset(start_pos, 0, (size_t)end_pos - (size_t)start_pos);
+    while (start_pos < end_pos) {
+        *start_pos++ = 0;
+    }
 }
 
 /**
  * @brief 将 FLASH 中的数据复制到内存中
  *
  */
-static void CopyData(void *sidata, void *sdata, void *edata)
+static void CopyData(unsigned int *sidata, unsigned int *sdata, unsigned int *edata)
 {
-    memcpy(sdata, sidata, (size_t)edata - (size_t)sdata);
+    while (sdata < edata) {
+        *sdata++ = *sidata++;
+    }
 }
 
 /**
@@ -34,8 +36,8 @@ void __UserSystemInit()
     // __HAL_RCC_D2SRAM3_CLK_ENABLE();
 
     // 各区域bss段的开始结束地址（定义在 ld 文件中）
-    extern size_t _sbss_d1, _sbss_d2, _sbss_d3, _sbss_itcm, _sbss_dtcm;
-    extern size_t _ebss_d1, _ebss_d2, _ebss_d3, _ebss_itcm, _ebss_dtcm;
+    extern unsigned int _sbss_d1, _sbss_d2, _sbss_d3, _sbss_itcm, _sbss_dtcm;
+    extern unsigned int _ebss_d1, _ebss_d2, _ebss_d3, _ebss_itcm, _ebss_dtcm;
 
     // 清零各区域的 bss 段
     ClearMem(&_sbss_d1, &_ebss_d1);
@@ -45,18 +47,18 @@ void __UserSystemInit()
     ClearMem(&_sbss_dtcm, &_ebss_dtcm);
 
     // 从 Flash 中复制数据到内存中
-    extern size_t _sidata_itcm, _sdata_itcm, _edata_itcm;
+    extern unsigned int _sidata_itcm, _sdata_itcm, _edata_itcm;
     CopyData(&_sidata_itcm, &_sdata_itcm, &_edata_itcm);
 
-    extern size_t _sidata_dtcm, _sdata_dtcm, _edata_dtcm;
+    extern unsigned int _sidata_dtcm, _sdata_dtcm, _edata_dtcm;
     CopyData(&_sidata_dtcm, &_sdata_dtcm, &_edata_dtcm);
 
-    extern size_t _sidata_d1, _sdata_d1, _edata_d1;
+    extern unsigned int _sidata_d1, _sdata_d1, _edata_d1;
     CopyData(&_sidata_d1, &_sdata_d1, &_edata_d1);
 
-    extern size_t _sidata_d2, _sdata_d2, _edata_d2;
+    extern unsigned int _sidata_d2, _sdata_d2, _edata_d2;
     CopyData(&_sidata_d2, &_sdata_d2, &_edata_d2);
 
-    extern size_t _sidata_d3, _sdata_d3, _edata_d3;
+    extern unsigned int _sidata_d3, _sdata_d3, _edata_d3;
     CopyData(&_sidata_d3, &_sdata_d3, &_edata_d3);
 }
