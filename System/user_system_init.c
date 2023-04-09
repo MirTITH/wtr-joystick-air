@@ -1,3 +1,5 @@
+#include "main.h"
+
 /**
  * @brief 清理内存的函数
  * @param start_pos 开始地址
@@ -31,9 +33,9 @@ static void CopyData(unsigned int *sidata, unsigned int *sdata, unsigned int *ed
  */
 void __UserSystemInit()
 {
-    // __HAL_RCC_D2SRAM1_CLK_ENABLE();
-    // __HAL_RCC_D2SRAM2_CLK_ENABLE();
-    // __HAL_RCC_D2SRAM3_CLK_ENABLE();
+    __HAL_RCC_D2SRAM1_CLK_ENABLE();
+    __HAL_RCC_D2SRAM2_CLK_ENABLE();
+    __HAL_RCC_D2SRAM3_CLK_ENABLE();
 
     // 各区域bss段的开始结束地址（定义在 ld 文件中）
     extern unsigned int _sbss_d1, _sbss_d2, _sbss_d3, _sbss_itcm, _sbss_dtcm;

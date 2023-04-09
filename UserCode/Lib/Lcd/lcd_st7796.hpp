@@ -16,7 +16,7 @@
 #include "tim.h"
 #include "mdma.h"
 
-class LcdSt7796 : LcdFmc, LcdBacklight
+class LcdSt7796 : public LcdFmc, public LcdBacklight
 {
 public:
     enum class Rotation {
@@ -66,12 +66,14 @@ public:
 
     void InitAll()
     {
+        LcdFmc::InitDma();
         InitDisplay();
         InitBacklight();
     }
     void InitDisplay();
     void InitBacklight()
     {
+        LcdBacklight::Init();
         SetBacklight(0.5);
     }
     void DisplayOnOff(bool is_display_on);
@@ -96,6 +98,7 @@ public:
      * @param data 要写入的数据。
      */
     void WriteScreen(int x1, int y1, int x2, int y2, uint16_t *data);
+    void WriteScreenDma(int x1, int y1, int x2, int y2, uint16_t *data);
     void FillScreen(uint16_t color = 0xffff);
     void FillArea(int x1, int y1, int x2, int y2, uint16_t color = 0xffff);
     int16_t GetScanline();

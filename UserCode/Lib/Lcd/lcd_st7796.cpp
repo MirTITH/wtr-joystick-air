@@ -311,6 +311,12 @@ void LcdSt7796::WriteScreen(int x1, int y1, int x2, int y2, uint16_t *data)
     }
 }
 
+void LcdSt7796::WriteScreenDma(int x1, int y1, int x2, int y2, uint16_t *data)
+{
+    setDataWritingArea(x1, y1, x2, y2);
+    WriteDataDma(data, (x2 - x1 + 1) * (y2 - y1 + 1));
+}
+
 void LcdSt7796::FillScreen(uint16_t color)
 {
     FillArea(0, 0, _horizontal_resolution - 1, _vertical_resolution - 1, color);

@@ -18,13 +18,17 @@ public:
     LcdBacklight(TIM_HandleTypeDef *htim, uint32_t channel)
         : _htim(htim), _channel(channel)
     {
+    }
+
+    void Init()
+    {
         if (_htim != nullptr) {
             readArr();
             HAL_TIM_PWM_Start(_htim, _channel);
         }
     }
 
-    ~LcdBacklight()
+    void Deinit()
     {
         if (_htim != nullptr) {
             HAL_TIM_PWM_Stop(_htim, _channel);

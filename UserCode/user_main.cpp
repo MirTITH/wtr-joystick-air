@@ -3,7 +3,7 @@
 #include "cmsis_os.h"
 #include "user_test.hpp"
 
-__attribute__((section(".itcmram"))) void StartDefaultTask(void const *argument)
+void StartDefaultTask(void const *argument)
 {
     (void)argument;
     HAL_Delay(250); // 用于防止进入睡眠模式时无法烧录和调试

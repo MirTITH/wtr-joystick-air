@@ -5,6 +5,7 @@
 #include "semphr.h"
 #include "in_handle_mode.h"
 #include "mdma.h"
+#include "dma.h"
 
 class LcdFmc
 {
@@ -13,6 +14,9 @@ private:
     volatile uint16_t *_data_address;
     SemaphoreHandle_t _sem = nullptr;
     MDMA_HandleTypeDef *_mdma;
+    uint32_t remaining_dma_data_num = 0;
+    uint16_t *next_dma_src;
+    const uint32_t MAX_DMA_DATA_NUM = 65535; // MDMA 一次最大传输 65535 bytes
 
 public:
     /**
@@ -52,6 +56,22 @@ public:
         vSemaphoreDelete(_sem);
     }
 
+    void InitDma()
+    {
+        // 配置DMA
+        extern void LcdFmc_DmaXferCpltCallback(MDMA_HandleTypeDef * _hmdma);
+        if (_mdma != nullptr) {
+            HAL_MDMA_RegisterCallback(_mdma, HAL_MDMA_XFER_CPLT_CB_ID, LcdFmc_DmaXferCpltCallback);
+        }
+    }
+
+    void DmaXferCpltCallback()
+    {
+        if (remaining_dma_data_num > 0) {
+            WriteDataDma(next_dma_src, remaining_dma_data_num);
+        }
+    }
+
     void Lock(TickType_t tick = portMAX_DELAY)
     {
         if (InHandlerMode()) {
@@ -72,11 +92,6 @@ public:
         }
     }
 
-    void InitDMA()
-    {
-        
-    }
-
     uint16_t ReadData()
     {
         return *_data_address;
@@ -90,5 +105,26 @@ public:
     void WriteData(uint16_t data)
     {
         *_data_address = data;
+    }
+
+    void WriteDataDma(uint16_t *data, uint32_t data_num)
+    {
+        if (_mdma != nullptr) {
+            if (data_num <= MAX_DMA_DATA_NUM / 2) {
+                HAL_MDMA_Start_IT(_mdma, (uint32_t)data, (uint32_t)_data_address, data_num * 2, 1);
+                remaining_dma_data_num = 0;
+            } else {
+                HAL_MDMA_Start_IT(_mdma, (uint32_t)data, (uint32_t)_data_address, (MAX_DMA_DATA_NUM / 2) * 2, 1); // (MAX_DMA_DATA_NUM / 2) * 2 处理后可以保证一定是最大的偶数
+                remaining_dma_data_num = data_num - MAX_DMA_DATA_NUM / 2;
+                next_dma_src           = data + MAX_DMA_DATA_NUM / 2;
+            }
+        }
+
+        // HAL_DMA_Start_IT(&hdma_memtomem_dma1_stream0, (uint32_t)data, (uint32_t)_data_address, data_num);
+    }
+
+    MDMA_HandleTypeDef *GetMdma()
+    {
+        return _mdma;
     }
 };

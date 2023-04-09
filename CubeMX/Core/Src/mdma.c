@@ -54,7 +54,7 @@ void MX_MDMA_Init(void)
   hmdma_mdma_channel40_sw_0.Init.Priority = MDMA_PRIORITY_LOW;
   hmdma_mdma_channel40_sw_0.Init.Endianness = MDMA_LITTLE_ENDIANNESS_PRESERVE;
   hmdma_mdma_channel40_sw_0.Init.SourceInc = MDMA_SRC_INC_HALFWORD;
-  hmdma_mdma_channel40_sw_0.Init.DestinationInc = MDMA_DEST_INC_HALFWORD;
+  hmdma_mdma_channel40_sw_0.Init.DestinationInc = MDMA_DEST_INC_DISABLE;
   hmdma_mdma_channel40_sw_0.Init.SourceDataSize = MDMA_SRC_DATASIZE_HALFWORD;
   hmdma_mdma_channel40_sw_0.Init.DestDataSize = MDMA_DEST_DATASIZE_HALFWORD;
   hmdma_mdma_channel40_sw_0.Init.DataAlignment = MDMA_DATAALIGN_PACKENABLE;
