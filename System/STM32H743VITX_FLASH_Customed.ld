@@ -83,7 +83,7 @@ SECTIONS
 
     *(.itcmram*)
     /* 路径里有 UserCode 的文件中的代码段 */
-    *UserCode*.o(.text*)
+    /* *UserCode*.o(.text*) */
 
     . = ALIGN(4);
     _edata_itcm = .;

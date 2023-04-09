@@ -36,6 +36,7 @@ private:
     Rotation _rotation = Rotation::landscape;
     uint16_t _horizontal_resolution;
     uint16_t _vertical_resolution;
+    void (*_ExternalWriteDataDmaCpltCallback)(LcdSt7796 *lcd);
 
     void delay(uint32_t delay_ms)
     {
@@ -58,6 +59,9 @@ private:
     void WriteDataDmaCpltCallback() override
     {
         UnLock();
+        if (_ExternalWriteDataDmaCpltCallback != nullptr) {
+            _ExternalWriteDataDmaCpltCallback(this);
+        }
     }
 
 public:
@@ -80,6 +84,11 @@ public:
     {
         LcdBacklight::Init();
         SetBacklight(0.2);
+    }
+
+    void RegisterExternalWriteScreenDmaCpltCallback(void (*ExternalWriteDataDmaCpltCallback)(LcdSt7796 *lcd))
+    {
+        _ExternalWriteDataDmaCpltCallback = ExternalWriteDataDmaCpltCallback;
     }
     void DisplayOnOff(bool is_display_on);
     void SetRotation(Rotation rotation);
