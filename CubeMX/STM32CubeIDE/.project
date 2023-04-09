@@ -297,6 +297,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/stm32h7xx_it.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/Core/tim.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/tim.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/USB_DEVICE/App/usb_device.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/USB_DEVICE/App/usb_device.c</locationURI>

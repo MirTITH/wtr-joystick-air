@@ -2,18 +2,19 @@
 #include "task.h"
 #include "main.h"
 
-#if (configUSE_TICKLESS_IDLE == 2)
+#if (configUSE_TICKLESS_IDLE == 0)
 extern void PreSleepProcessing(TickType_t *ulExpectedIdleTime);
 extern void PostSleepProcessing(TickType_t ulExpectedIdleTime);
 
 /**
  * @brief 在内核进入睡眠状态前，该函数会被调用
  *
- * @param ulExpectedIdleTime 系统将睡眠的 Tick
+ * @param ulExpectedIdleTime 系统将睡眠的 Tick，将此值设为0可以取消此次睡眠
  */
 void PreSleepProcessing(TickType_t *ulExpectedIdleTime)
 {
     (void)ulExpectedIdleTime;
+
     // 关闭 HAL 的 Tick 中断，避免系统过快醒来
     HAL_SuspendTick();
 }
