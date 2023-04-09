@@ -1,6 +1,6 @@
-# Template of STM32 CubeMX project for EIDE
+# WTR Joystick Air
 
-## 工程说明
+## EIDE 工程说明
 ### 目录结构
 
 - CubeMX: 用于存放 CubeMX 的 ioc 文件和 CubeMX 生成的所有文件
