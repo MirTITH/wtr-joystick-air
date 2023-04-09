@@ -247,11 +247,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/adc.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/Core/dma.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/dma.c</locationURI>
-		</link>
-		<link>
 			<name>Application/User/Core/fmc.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Core/Src/fmc.c</locationURI>

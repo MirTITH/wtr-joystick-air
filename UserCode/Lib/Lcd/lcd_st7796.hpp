@@ -55,6 +55,11 @@ private:
      */
     void setDataWritingArea(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 
+    void WriteDataDmaCpltCallback() override
+    {
+        UnLock();
+    }
+
 public:
     const uint16_t PHYSICAL_WIDTH  = 320;
     const uint16_t PHYSICAL_HEIGHT = 480;
@@ -74,7 +79,7 @@ public:
     void InitBacklight()
     {
         LcdBacklight::Init();
-        SetBacklight(0.5);
+        SetBacklight(0.2);
     }
     void DisplayOnOff(bool is_display_on);
     void SetRotation(Rotation rotation);

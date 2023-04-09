@@ -150,6 +150,7 @@ void LcdSt7796::setDataWritingArea(uint16_t x1, uint16_t y1, uint16_t x2, uint16
 
 void LcdSt7796::InitDisplay()
 {
+    Lock();
     WriteCmd(ST7796S_SWRESET);
     delay(100);
 
@@ -251,6 +252,8 @@ void LcdSt7796::InitDisplay()
     WriteCmd(ST7796S_CSCON);
     WriteData(0x69);
 
+    UnLock();
+
     SetRotation(_rotation);
     SetColorOrder(_color_order);
     InvertDisplay(true);
@@ -259,11 +262,14 @@ void LcdSt7796::InitDisplay()
 
 void LcdSt7796::DisplayOnOff(bool is_display_on)
 {
+    Lock();
     WriteCmd(is_display_on ? ST7796S_DISPON : ST7796S_DISPOFF);
+    UnLock();
 }
 
 void LcdSt7796::SetRotation(Rotation rotation)
 {
+    Lock();
     _rotation = rotation;
     switch (rotation) {
         case Rotation::portrait:
@@ -287,21 +293,27 @@ void LcdSt7796::SetRotation(Rotation rotation)
             break;
     }
     updateRotationAndColorOrder();
+    UnLock();
 }
 
 void LcdSt7796::SetColorOrder(ColorOrder color_order)
 {
+    Lock();
     _color_order = color_order;
     updateRotationAndColorOrder();
+    UnLock();
 }
 
 void LcdSt7796::InvertDisplay(bool is_invert)
 {
+    Lock();
     WriteCmd(is_invert ? ST7796S_INVON : ST7796S_INVOFF);
+    UnLock();
 }
 
 void LcdSt7796::WriteScreen(int x1, int y1, int x2, int y2, uint16_t *data)
 {
+    Lock();
     setDataWritingArea(x1, y1, x2, y2);
     int total = (x2 - x1 + 1) * (y2 - y1 + 1);
 
@@ -309,10 +321,12 @@ void LcdSt7796::WriteScreen(int x1, int y1, int x2, int y2, uint16_t *data)
         WriteData(*data++);
         total--;
     }
+    UnLock();
 }
 
 void LcdSt7796::WriteScreenDma(int x1, int y1, int x2, int y2, uint16_t *data)
 {
+    Lock(); // 在 WriteDataDmaCpltCallback() 中解锁
     setDataWritingArea(x1, y1, x2, y2);
     WriteDataDma(data, (x2 - x1 + 1) * (y2 - y1 + 1));
 }
@@ -324,6 +338,7 @@ void LcdSt7796::FillScreen(uint16_t color)
 
 void LcdSt7796::FillArea(int x1, int y1, int x2, int y2, uint16_t color)
 {
+    Lock();
     setDataWritingArea(x1, y1, x2, y2);
     int total = (x2 - x1 + 1) * (y2 - y1 + 1);
 
@@ -331,14 +346,17 @@ void LcdSt7796::FillArea(int x1, int y1, int x2, int y2, uint16_t color)
         WriteData(color);
         total--;
     }
+    UnLock();
 }
 
 int16_t LcdSt7796::GetScanline()
 {
     uint16_t result;
+    Lock();
     WriteCmd(ST7796S_GSCAN);
     ReadData();
     result = (ReadData() & 0x00ff) << 8;
     result |= ReadData() & 0x00ff;
+    UnLock();
     return result;
 }
