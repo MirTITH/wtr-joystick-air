@@ -4,6 +4,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "in_handle_mode.h"
+#include "mdma.h"
 
 class LcdFmc
 {
@@ -11,12 +12,14 @@ private:
     volatile uint16_t *_cmd_address;
     volatile uint16_t *_data_address;
     SemaphoreHandle_t _sem = nullptr;
+    MDMA_HandleTypeDef *_mdma;
 
 public:
     /**
      * @param chip_select FMC 的 Chip Select，应为下列值之一：1,2,3,4
      */
-    LcdFmc(int chip_select)
+    LcdFmc(int chip_select, MDMA_HandleTypeDef *mdma)
+        : _mdma(mdma)
     {
         uint32_t lcd_base;
         switch (chip_select) {
@@ -67,6 +70,11 @@ public:
         } else {
             xSemaphoreGive(_sem);
         }
+    }
+
+    void InitDMA()
+    {
+        
     }
 
     uint16_t ReadData()

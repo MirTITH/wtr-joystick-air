@@ -267,20 +267,20 @@ void LcdSt7796::SetRotation(Rotation rotation)
     _rotation = rotation;
     switch (rotation) {
         case Rotation::portrait:
-            _now_width  = PHYSICAL_WIDTH;
-            _now_height = PHYSICAL_HEIGHT;
+            _horizontal_resolution = PHYSICAL_WIDTH;
+            _vertical_resolution   = PHYSICAL_HEIGHT;
             break;
         case Rotation::landscape:
-            _now_width  = PHYSICAL_HEIGHT;
-            _now_height = PHYSICAL_WIDTH;
+            _horizontal_resolution = PHYSICAL_HEIGHT;
+            _vertical_resolution   = PHYSICAL_WIDTH;
             break;
         case Rotation::inverse_portrait:
-            _now_width  = PHYSICAL_WIDTH;
-            _now_height = PHYSICAL_HEIGHT;
+            _horizontal_resolution = PHYSICAL_WIDTH;
+            _vertical_resolution   = PHYSICAL_HEIGHT;
             break;
         case Rotation::inverse_landscape:
-            _now_width  = PHYSICAL_HEIGHT;
-            _now_height = PHYSICAL_WIDTH;
+            _horizontal_resolution = PHYSICAL_HEIGHT;
+            _vertical_resolution   = PHYSICAL_WIDTH;
             break;
 
         default:
@@ -307,6 +307,22 @@ void LcdSt7796::WriteScreen(int x1, int y1, int x2, int y2, uint16_t *data)
 
     while (total > 0) {
         WriteData(*data++);
+        total--;
+    }
+}
+
+void LcdSt7796::FillScreen(uint16_t color)
+{
+    FillArea(0, 0, _horizontal_resolution - 1, _vertical_resolution - 1, color);
+}
+
+void LcdSt7796::FillArea(int x1, int y1, int x2, int y2, uint16_t color)
+{
+    setDataWritingArea(x1, y1, x2, y2);
+    int total = (x2 - x1 + 1) * (y2 - y1 + 1);
+
+    while (total > 0) {
+        WriteData(color);
         total--;
     }
 }
