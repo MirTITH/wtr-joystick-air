@@ -11,7 +11,7 @@
  *********************/
 #include "lv_port_disp.h"
 #include "lcd_st7796.hpp"
-#include "cmsis_os.h"
+#include "FreeRTOS.h"
 
 /*********************
  *      DEFINES
@@ -60,7 +60,7 @@ static void dma_cplt_cb(LcdSt7796 *lcd)
 static void wait_callback(struct _lv_disp_drv_t *disp_drv)
 {
     (void)disp_drv;
-    osThreadYield();
+    taskYIELD();
 }
 
 void lv_port_disp_init(void)
