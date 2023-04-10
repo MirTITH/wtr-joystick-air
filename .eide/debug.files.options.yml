@@ -23,7 +23,7 @@ version: '1.0'
 files:
 #   './test/**/*.c': --c99
     './UserCode/!(ThirdParty)**': -Wextra
-    './UserCode/**': -Wextra
+    # './UserCode/**': -Wextra
 
 #
 # for source files with virtual paths

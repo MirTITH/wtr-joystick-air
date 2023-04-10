@@ -2,7 +2,7 @@
 #include "task.h"
 #include "main.h"
 
-#if (configUSE_TICKLESS_IDLE == 0)
+#if (0)
 extern void PreSleepProcessing(TickType_t *ulExpectedIdleTime);
 extern void PostSleepProcessing(TickType_t ulExpectedIdleTime);
 

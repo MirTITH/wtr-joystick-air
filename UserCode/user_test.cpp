@@ -115,9 +115,9 @@ void TestThreadEntry(void *argument)
 
     for (;;) {
         LvglLock();
-        lv_task_handler();
+        lv_timer_handler();
         LvglUnlock();
 
-        vTaskDelayUntil(&PreviousWakeTime, 5);
+        vTaskDelayUntil(&PreviousWakeTime, 10);
     }
 }
