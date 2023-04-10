@@ -1,6 +1,7 @@
 #include "user_test.hpp"
 #include "cmsis_os.h"
 #include "lvgl.h"
+#include "demos/lv_demos.h"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -107,9 +108,11 @@ void TestThreadEntry(void *argument)
 
     LvglMutex = xSemaphoreCreateRecursiveMutex();
 
-    lv_example_anim_1();
-    lv_example_anim_2();
-    lv_example_anim_3();
+    // lv_example_anim_1();
+    // lv_example_anim_2();
+    // lv_example_anim_3();
+
+    lv_demo_benchmark();
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
@@ -118,6 +121,6 @@ void TestThreadEntry(void *argument)
         lv_timer_handler();
         LvglUnlock();
 
-        vTaskDelayUntil(&PreviousWakeTime, 10);
+        vTaskDelayUntil(&PreviousWakeTime, 5);
     }
 }

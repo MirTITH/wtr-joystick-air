@@ -6,10 +6,10 @@
 extern "C" {
 #endif
 
-void vApplicationTickHook(void)
-{
-    lv_tick_inc(1000 / configTICK_RATE_HZ);
-}
+// void vApplicationTickHook(void)
+// {
+//     lv_tick_inc(1000 / configTICK_RATE_HZ);
+// }
 
 #ifdef __cplusplus
 }

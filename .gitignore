@@ -16,3 +16,4 @@
 
 # user defined
 /.pack
+/UserCode/ThirdParty/lvgl/lvgl/demos

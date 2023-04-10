@@ -2,7 +2,7 @@
 #include "task.h"
 #include "main.h"
 
-#if (0)
+#if 1
 extern void PreSleepProcessing(TickType_t *ulExpectedIdleTime);
 extern void PostSleepProcessing(TickType_t ulExpectedIdleTime);
 

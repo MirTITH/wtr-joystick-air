@@ -83,7 +83,7 @@ SECTIONS
 
     *(.itcmram*)
     /* 路径里有 UserCode 的文件中的代码段 */
-    *UserCode*.o(.text*)
+    EXCLUDE_FILE (*UserCode/ThirdParty*.o) *UserCode*.o(.text*)
 
     . = ALIGN(4);
     _edata_itcm = .;
@@ -95,7 +95,8 @@ SECTIONS
     . = ALIGN(4);
     _sbss_dtcm = .;         /* define a global symbol at dtcmram bss start */
 
-    *heap_4.o(.bss.ucHeap*) /* FreeRTOS 的内存池 */
+    /* FreeRTOS 的内存池 */
+    *heap_4.o(.bss.ucHeap*) 
     *(.bss.dtcmram*)
 
     . = ALIGN(4);
