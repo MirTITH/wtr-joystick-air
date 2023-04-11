@@ -14,7 +14,7 @@
         "one-elf-section-per-function": true,
         "one-elf-section-per-data": true,
         "C_FLAGS": "-fno-exceptions -pipe",
-        "CXX_FLAGS": "-fno-rtti -fno-threadsafe-statics"
+        "CXX_FLAGS": "-fno-rtti"
     },
     "asm-compiler": {
         "ASM_FLAGS": "-ffunction-sections -fdata-sections"
