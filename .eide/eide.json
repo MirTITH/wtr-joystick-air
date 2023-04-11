@@ -105,7 +105,9 @@
           "UserCode/Lib/Lcd",
           "UserCode/Lib/System",
           "UserCode/ThirdParty/lvgl/lvgl",
-          "UserCode/ThirdParty/lvgl"
+          "UserCode/ThirdParty/lvgl",
+          "UserCode/App",
+          "UserCode"
         ],
         "libList": [],
         "sourceDirList": [],

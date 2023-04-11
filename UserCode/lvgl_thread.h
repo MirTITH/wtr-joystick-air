@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 void StartLvglThread();
-BaseType_t LvglLock(TickType_t block_time);
+BaseType_t LvglLock(TickType_t block_time = portMAX_DELAY);
 BaseType_t LvglUnlock();
 
 #ifdef __cplusplus

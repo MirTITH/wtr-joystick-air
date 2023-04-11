@@ -2,7 +2,7 @@
 #include "task.h"
 #include "main.h"
 
-#if 1
+#if 0 // 设置为0，禁用空闲时睡眠
 extern void PreSleepProcessing(TickType_t *ulExpectedIdleTime);
 extern void PostSleepProcessing(TickType_t ulExpectedIdleTime);
 
