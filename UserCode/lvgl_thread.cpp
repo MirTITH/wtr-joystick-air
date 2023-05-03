@@ -41,16 +41,14 @@ static void LvglThreadEntry(void *argument)
 {
     (void)argument;
 
-    LvglMutex = xSemaphoreCreateRecursiveMutex();
-
     // lv_demo_benchmark();
 
-    LvglApp *app1 = new TestApp();
+    // LvglApp *app1 = new TestApp();
 
-    xTaskCreate(LvglAppRunnerEntry, app1->app_name.c_str(), app1->GetStackDepth(), app1, app1->GetPriority(), nullptr);
+    // xTaskCreate(LvglAppRunnerEntry, app1->app_name.c_str(), app1->GetStackDepth(), app1, app1->GetPriority(), nullptr);
 
-    auto background_text = lv_textarea_create(lv_scr_act());
-    lv_textarea_add_text(background_text, "This is the background text!");
+    // auto background_text = lv_textarea_create(lv_scr_act());
+    // lv_textarea_add_text(background_text, "This is the background text!");
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
@@ -65,5 +63,6 @@ static void LvglThreadEntry(void *argument)
 
 void StartLvglThread()
 {
+    LvglMutex = xSemaphoreCreateRecursiveMutex();
     xTaskCreate(LvglThreadEntry, "lvgl_thread", 2048, nullptr, 3, nullptr);
 }

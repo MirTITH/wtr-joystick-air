@@ -20,6 +20,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "adc.h"
+#include "dma.h"
 #include "i2c.h"
 #include "mdma.h"
 #include "quadspi.h"
@@ -108,12 +109,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_MDMA_Init();
-  MX_I2C1_Init();
-  MX_I2C2_Init();
+  MX_DMA_Init();
   MX_QUADSPI_Init();
   MX_ADC1_Init();
-  MX_FMC_Init();
+  MX_I2C1_Init();
   MX_TIM8_Init();
+  MX_ADC3_Init();
+  MX_I2C2_Init();
+  MX_FMC_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -160,13 +163,15 @@ void SystemClock_Config(void)
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
+  /** Macro to configure the PLL clock source
+  */
+  __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSE);
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSIState = RCC_HSI_DIV1;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 5;
@@ -211,8 +216,16 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_CKPER;
-  PeriphClkInitStruct.CkperClockSelection = RCC_CLKPSOURCE_HSI;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInitStruct.PLL2.PLL2M = 25;
+  PeriphClkInitStruct.PLL2.PLL2N = 256;
+  PeriphClkInitStruct.PLL2.PLL2P = 4;
+  PeriphClkInitStruct.PLL2.PLL2Q = 2;
+  PeriphClkInitStruct.PLL2.PLL2R = 2;
+  PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_0;
+  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
+  PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();

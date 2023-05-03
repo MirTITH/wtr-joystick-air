@@ -107,7 +107,10 @@
           "UserCode/ThirdParty/lvgl/lvgl",
           "UserCode/ThirdParty/lvgl",
           "UserCode/App",
-          "UserCode"
+          "UserCode",
+          "UserCode/ThirdParty/mpu9250/src",
+          "UserCode/ThirdParty/mpu9250/interface",
+          "UserCode/ThirdParty/mpu9250/example"
         ],
         "libList": [],
         "sourceDirList": [],

@@ -1,10 +1,17 @@
 #include "main.h"
 #include "lcd_st7796.hpp"
 #include "lvgl.h"
+#include "adc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+    extern uint32_t AdcCpltCount;
+    AdcCpltCount++;
+}
 
 // void vApplicationTickHook(void)
 // {
