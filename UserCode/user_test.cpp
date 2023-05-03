@@ -37,6 +37,7 @@ void TestThreadEntry(void *argument)
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
     while (true) {
+        SCB_InvalidateDCache_by_Addr(Adc3Data, sizeof(Adc3Data));
         for (int i = 0; i < 4; i++) {
             adc_voltage[i] = (double)Adc3Data[i] / (1 << 16) * 3.3;
         }
