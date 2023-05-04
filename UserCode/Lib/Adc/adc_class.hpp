@@ -23,6 +23,7 @@ private:
     ADC_HandleTypeDef *hadc_;
     const float vref_;
     uint16_t *data_ = nullptr;
+    bool is_inited_ = false;
 
 public:
     /**
@@ -46,6 +47,11 @@ public:
     }
 
     /**
+     * @brief 获取 ADC 读数取值范围的最大值
+     */
+    uint16_t GetMaxRange() const;
+
+    /**
      * @brief 获取 ADC 原始数据
      *
      * @param index [0, NbrOfConversion - 1]
@@ -53,6 +59,19 @@ public:
     std::remove_reference<decltype(*data_)>::type GetData(size_t index) const;
 
     std::vector<std::remove_reference<decltype(*data_)>::type> GetAllData() const;
+
+    /**
+     * @brief 获取归一化数据
+     *
+     * @param index 范围：[0, NbrOfConversion - 1]
+     * @return float 归一化数据，范围：[0, 1]
+     */
+    float GetNormalizedData(size_t index) const
+    {
+        return (float)GetData(index) / GetMaxRange();
+    }
+
+    std::vector<float> GetAllNormalizedData() const;
 
     /**
      * @brief Get voltage (V)

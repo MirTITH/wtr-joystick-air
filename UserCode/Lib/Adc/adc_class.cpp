@@ -3,11 +3,66 @@
 
 void Adc::Init()
 {
+    if (is_inited_) {
+        return;
+    }
+    is_inited_ = true;
+
     // 写这么长是为了自动推导 data_ 类型
     data_ = new std::remove_reference<decltype(*data_)>::type[hadc_->Init.NbrOfConversion];
 
     // 校准 ADC （不同 stm32 型号该函数可能不一样或不存在，注意修改）
     HAL_ADCEx_Calibration_Start(hadc_, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED); // For STM32H7
+}
+
+uint16_t Adc::GetMaxRange() const
+{
+    switch (hadc_->Init.Resolution) {
+#ifdef ADC_RESOLUTION_6B
+        case ADC_RESOLUTION_6B:
+            return 0x3f;
+            break;
+#endif
+#ifdef ADC_RESOLUTION_8B
+        case ADC_RESOLUTION_8B:
+            return 0xff;
+            break;
+#endif
+#ifdef ADC_RESOLUTION_10B
+        case ADC_RESOLUTION_10B:
+            return 0x3ff;
+            break;
+#endif
+#ifdef ADC_RESOLUTION_12B
+        case ADC_RESOLUTION_12B:
+            return 0xfff;
+            break;
+#endif
+#ifdef ADC_RESOLUTION_14B
+        case ADC_RESOLUTION_14B:
+            return 0x3fff;
+            break;
+#endif
+#ifdef ADC_RESOLUTION_16B
+        case ADC_RESOLUTION_16B:
+            return 0xffff;
+            break;
+#endif
+#ifdef ADC_RESOLUTION_14B_OPT
+        case ADC_RESOLUTION_14B_OPT:
+            return 0x3fff;
+            break;
+#endif
+#ifdef ADC_RESOLUTION_12B_OPT
+        case ADC_RESOLUTION_12B_OPT:
+            return 0xfff;
+            break;
+#endif
+
+        default:
+            return 0;
+            break;
+    }
 }
 
 std::remove_reference<decltype(*Adc::data_)>::type Adc::GetData(size_t index) const
@@ -27,6 +82,18 @@ std::vector<std::remove_reference<decltype(*Adc::data_)>::type> Adc::GetAllData(
     for (size_t i = 0; i < hadc_->Init.NbrOfConversion; i++) {
         result.at(i) = data_[i];
     }
+    return result;
+}
+
+std::vector<float> Adc::GetAllNormalizedData() const
+{
+    auto all_data = GetAllData();
+    std::vector<float> result(hadc_->Init.NbrOfConversion);
+    auto max_range = GetMaxRange();
+    for (size_t i = 0; i < hadc_->Init.NbrOfConversion; i++) {
+        result.at(i) = (float)all_data.at(i) / max_range;
+    }
+
     return result;
 }
 

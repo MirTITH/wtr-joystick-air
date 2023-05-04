@@ -8,33 +8,39 @@
 #include <sstream>
 #include "Adc/adc_class_define.hpp"
 #include "Battery/battery_define.hpp"
+#include "Joystick/joystick_define.hpp"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
 
 using namespace std;
 
-uint16_t Adc1Data[2];
-uint16_t Adc2Data[2];
-uint16_t Adc3Data[4];
-
 void TestThreadEntry(void *argument)
 {
     (void)argument;
 
-    Adc1.Init();
-    Adc1.StartDma();
-    Adc2.Init();
-    Adc2.StartDma();
     Adc3.Init();
     Adc3.StartDma();
+    JoystickL.x_max    = 0.96;
+    JoystickL.x_middle = 0.4435;
+    JoystickL.x_min    = 0;
+    JoystickL.y_max    = 0.9987;
+    JoystickL.y_middle = 0.505;
+    JoystickL.y_min    = 0;
+    JoystickL.Init();
+
+    JoystickR.x_max    = 0.7;
+    JoystickR.x_middle = 0.526;
+    JoystickR.x_min    = 0;
+    JoystickR.y_max    = 0.9995;
+    JoystickR.y_middle = 0.51;
+    JoystickR.y_min    = 0;
+    JoystickR.Init();
 
     LvglLock();
 
     auto text = lv_textarea_create(lv_scr_act());
     lv_obj_set_size(text, lv_pct(100), lv_pct(100));
-
-    // uint32_t lastAdc1CpltCount = Adc1CpltCount;
 
     LvglUnlock();
 
@@ -44,18 +50,20 @@ void TestThreadEntry(void *argument)
         stringstream sstr;
         sstr.precision(6);
         sstr.setf(std::ios::fixed);
-        for (auto &volt : Adc1.GetAllVoltage()) {
-            sstr << volt << " ";
-        }
+        sstr << JoystickL.Pos().x << " " << JoystickL.Pos().y << "\t";
+        sstr << JoystickR.Pos().x << " " << JoystickR.Pos().y;
         sstr << endl;
-        for (auto &volt : Adc2.GetAllVoltage()) {
-            sstr << volt << " ";
-        }
+        sstr << JoystickL.RawPos().x << " " << JoystickL.RawPos().y << "\t";
+        sstr << JoystickR.RawPos().x << " " << JoystickR.RawPos().y;
         sstr << endl;
-        for (auto &volt : Adc3.GetAllVoltage()) {
-            sstr << volt << " ";
-        }
-        sstr << endl;
+
+        // for (auto &volt : Adc1.GetAllVoltage()) {
+        //     sstr << volt << " ";
+        // }
+        // for (auto &volt : Adc2.GetAllVoltage()) {
+        //     sstr << volt << " ";
+        // }
+        // sstr << endl;
 
         sstr << battery.GetVoltage();
 
