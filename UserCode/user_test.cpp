@@ -7,6 +7,7 @@
 #include "lvgl.h"
 #include <sstream>
 #include "Adc/adc_class_define.hpp"
+#include "Battery/battery_define.hpp"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -20,14 +21,6 @@ uint16_t Adc3Data[4];
 void TestThreadEntry(void *argument)
 {
     (void)argument;
-
-    // HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
-    // HAL_ADCEx_Calibration_Start(&hadc2, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
-    // HAL_ADCEx_Calibration_Start(&hadc3, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
-
-    // HAL_ADC_Start_DMA(&hadc1, (uint32_t *)Adc1Data, 2);
-    // HAL_ADC_Start_DMA(&hadc2, (uint32_t *)Adc2Data, 2);
-    // HAL_ADC_Start_DMA(&hadc3, (uint32_t *)Adc3Data, 4);
 
     Adc1.Init();
     Adc1.StartDma();
@@ -63,6 +56,8 @@ void TestThreadEntry(void *argument)
             sstr << volt << " ";
         }
         sstr << endl;
+
+        sstr << battery.GetVoltage();
 
         LvglLock();
         lv_textarea_set_text(text, sstr.str().c_str());
