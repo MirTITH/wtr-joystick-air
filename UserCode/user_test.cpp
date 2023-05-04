@@ -19,6 +19,7 @@ uint16_t Adc3Data[12];
 uint32_t Adc1CpltCount = 0;
 uint32_t Adc2CpltCount = 0;
 uint32_t Adc3CpltCount = 0;
+uint32_t Adc3IRQCount  = 0;
 
 void TestThreadEntry(void *argument)
 {
@@ -54,6 +55,8 @@ void TestThreadEntry(void *argument)
             sstr << (double)Adc3Data[i] * 11.5 / 1.5 * 3.3 / (1 << 16) << " ";
         }
 
+        sstr << endl;
+
         // for (int i = 0; i < 2; i++) {
         //     sstr << (double)Adc1Data[i] * 3.3 / (1 << 16) << " ";
         // }
@@ -61,7 +64,7 @@ void TestThreadEntry(void *argument)
         //     sstr << (double)Adc2Data[i] * 3.3 / (1 << 16) << " ";
         // }
 
-        sstr << Adc3CpltCount << endl;
+        sstr << Adc3CpltCount << " " << Adc3IRQCount << endl;
         LvglLock();
         lv_textarea_set_text(text, sstr.str().c_str());
         LvglUnlock();
