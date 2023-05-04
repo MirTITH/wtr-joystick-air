@@ -5,9 +5,9 @@
 
 static SemaphoreHandle_t LvglMutex;
 
-BaseType_t LvglLock(TickType_t block_time)
+BaseType_t LvglLock()
 {
-    return xSemaphoreTakeRecursive(LvglMutex, block_time);
+    return xSemaphoreTakeRecursive(LvglMutex, portMAX_DELAY);
 }
 
 BaseType_t LvglUnlock()
