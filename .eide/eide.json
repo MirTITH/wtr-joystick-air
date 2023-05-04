@@ -110,7 +110,8 @@
           "UserCode",
           "UserCode/ThirdParty/mpu9250/src",
           "UserCode/ThirdParty/mpu9250/interface",
-          "UserCode/ThirdParty/mpu9250/example"
+          "UserCode/ThirdParty/mpu9250/example",
+          "UserCode/Lib"
         ],
         "libList": [],
         "sourceDirList": [],

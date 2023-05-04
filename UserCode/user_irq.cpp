@@ -9,8 +9,13 @@ extern "C" {
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-    extern uint32_t AdcCpltCount;
-    AdcCpltCount++;
+    extern uint32_t Adc3CpltCount;
+    extern uint32_t Adc1CpltCount;
+    if (hadc->Instance == hadc1.Instance) {
+        Adc1CpltCount++;
+    } else if (hadc->Instance == hadc3.Instance) {
+        Adc3CpltCount++;
+    }
 }
 
 // void vApplicationTickHook(void)
