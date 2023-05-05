@@ -59,14 +59,18 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define KnobL_A_Pin GPIO_PIN_3
 #define KnobL_A_GPIO_Port GPIOE
+#define KnobL_A_EXTI_IRQn EXTI3_IRQn
 #define KnobL_B_Pin GPIO_PIN_5
 #define KnobL_B_GPIO_Port GPIOE
+#define KnobL_B_EXTI_IRQn EXTI9_5_IRQn
 #define KnobR_A_Pin GPIO_PIN_6
 #define KnobR_A_GPIO_Port GPIOE
+#define KnobR_A_EXTI_IRQn EXTI9_5_IRQn
 #define KnobL_Btn_Pin GPIO_PIN_13
 #define KnobL_Btn_GPIO_Port GPIOC
 #define KnobR_B_Pin GPIO_PIN_0
 #define KnobR_B_GPIO_Port GPIOC
+#define KnobR_B_EXTI_IRQn EXTI0_IRQn
 #define JoystickL_Btn_Pin GPIO_PIN_1
 #define JoystickL_Btn_GPIO_Port GPIOC
 #define KnobR_Btn_Pin GPIO_PIN_2
@@ -137,6 +141,7 @@ void Error_Handler(void);
 #define Tp_SCl_GPIO_Port GPIOB
 #define Tp_Int_Pin GPIO_PIN_9
 #define Tp_Int_GPIO_Port GPIOB
+#define Tp_Int_EXTI_IRQn EXTI9_5_IRQn
 #define Tp_Rst_Pin GPIO_PIN_0
 #define Tp_Rst_GPIO_Port GPIOE
 #define Kb_MC3_Pin GPIO_PIN_1

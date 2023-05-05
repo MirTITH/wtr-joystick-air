@@ -68,9 +68,9 @@ void TestThreadEntry(void *argument)
         // for (auto &volt : Adc2.GetAllVoltage()) {
         //     sstr << volt << " ";
         // }
-        // sstr << endl;
+        sstr << endl;
 
-        // sstr << battery.GetVoltage();
+        sstr << battery.GetVoltage();
 
         LvglLock();
         lv_textarea_set_text(text, sstr.str().c_str());
