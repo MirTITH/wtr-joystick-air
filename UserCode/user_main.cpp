@@ -13,6 +13,6 @@ void StartDefaultTask(void const *argument)
     lv_init();
     lv_port_disp_init();
     StartLvglThread();
-    xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 3, nullptr);
+    xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 2, nullptr);
     vTaskDelete(nullptr);
 }

@@ -22,8 +22,17 @@ class Adc
 private:
     ADC_HandleTypeDef *hadc_;
     const float vref_;
-    uint16_t *data_ = nullptr;
-    bool is_inited_ = false;
+    uint16_t *adc_data_;
+    uint8_t number_of_conversion_ = 0;
+    bool is_inited_               = false;
+    uint16_t max_range_;
+
+    uint16_t CalcMaxRange() const;
+
+    void InvalidateDCache() const
+    {
+        SCB_InvalidateDCache_by_Addr(adc_data_, sizeof(*adc_data_) * number_of_conversion_);
+    }
 
 public:
     /**
@@ -34,11 +43,27 @@ public:
     Adc(ADC_HandleTypeDef *hadc, float vref = 3.3)
         : hadc_(hadc), vref_(vref){};
 
+    /**
+     * @brief 初始化 ADC
+     * @note 该函数内部会调用一次 Calibrate() 来校准 ADC
+     */
     void Init();
+
+    /**
+     * @brief 校准 ADC
+     *
+     */
+    void Calibrate()
+    {
+        // 校准 ADC （不同 stm32 型号该函数可能不一样或不存在，注意修改）
+        HAL_ADCEx_Calibration_Start(hadc_, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED); // For STM32H7
+    }
 
     void StartDma()
     {
-        HAL_ADC_Start_DMA(hadc_, (uint32_t *)data_, hadc_->Init.NbrOfConversion);
+        // 需要先初始化才能调用该函数
+        while (is_inited_ == false) {}
+        HAL_ADC_Start_DMA(hadc_, (uint32_t *)adc_data_, number_of_conversion_);
     }
 
     void StopDma()
@@ -49,16 +74,35 @@ public:
     /**
      * @brief 获取 ADC 读数取值范围的最大值
      */
-    uint16_t GetMaxRange() const;
+    uint16_t GetMaxRange() const
+    {
+        return max_range_;
+    }
 
     /**
      * @brief 获取 ADC 原始数据
      *
      * @param index [0, NbrOfConversion - 1]
      */
-    std::remove_reference<decltype(*data_)>::type GetData(size_t index) const;
+    std::remove_reference<decltype(*adc_data_)>::type GetData(size_t index) const
+    {
+        if (index < number_of_conversion_) {
+            InvalidateDCache();
+            return adc_data_[index];
+        } else {
+            return 0;
+        }
+    }
 
-    std::vector<std::remove_reference<decltype(*data_)>::type> GetAllData() const;
+    std::vector<std::remove_reference<decltype(*adc_data_)>::type> GetAllData() const
+    {
+        std::vector<std::remove_reference<decltype(*adc_data_)>::type> result(number_of_conversion_);
+        InvalidateDCache();
+        for (size_t i = 0; i < number_of_conversion_; i++) {
+            result.at(i) = adc_data_[i];
+        }
+        return result;
+    }
 
     /**
      * @brief 获取归一化数据
@@ -68,7 +112,7 @@ public:
      */
     float GetNormalizedData(size_t index) const
     {
-        return (float)GetData(index) / GetMaxRange();
+        return (float)GetData(index) / max_range_;
     }
 
     std::vector<float> GetAllNormalizedData() const;
@@ -79,7 +123,10 @@ public:
      * @param index [0, NbrOfConversion - 1]
      * @return float Voltage
      */
-    float GetVoltage(size_t index) const;
+    float GetVoltage(size_t index) const
+    {
+        return (float)GetData(index) / max_range_ * vref_;
+    }
 
     std::vector<float> GetAllVoltage() const;
 
@@ -102,8 +149,8 @@ public:
 
     ~Adc()
     {
-        if (data_ != nullptr) {
-            delete[] data_;
+        if (adc_data_ != nullptr) {
+            delete[] adc_data_;
         }
     };
 };

@@ -1,22 +1,9 @@
 #include "Adc/adc_class.hpp"
 #include "adc_class.hpp"
 
-void Adc::Init()
+uint16_t Adc::CalcMaxRange() const
 {
-    if (is_inited_) {
-        return;
-    }
-    is_inited_ = true;
-
-    // 写这么长是为了自动推导 data_ 类型
-    data_ = new std::remove_reference<decltype(*data_)>::type[hadc_->Init.NbrOfConversion];
-
-    // 校准 ADC （不同 stm32 型号该函数可能不一样或不存在，注意修改）
-    HAL_ADCEx_Calibration_Start(hadc_, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED); // For STM32H7
-}
-
-uint16_t Adc::GetMaxRange() const
-{
+    // 计算 max_range_
     switch (hadc_->Init.Resolution) {
 #ifdef ADC_RESOLUTION_6B
         case ADC_RESOLUTION_6B:
@@ -65,54 +52,37 @@ uint16_t Adc::GetMaxRange() const
     }
 }
 
-std::remove_reference<decltype(*Adc::data_)>::type Adc::GetData(size_t index) const
+void Adc::Init()
 {
-    if (index < hadc_->Init.NbrOfConversion) {
-        SCB_InvalidateDCache_by_Addr(data_, sizeof(data_));
-        return data_[index];
-    } else {
-        return 0;
-    }
-}
+    if (is_inited_)
+        return;
 
-std::vector<std::remove_reference<decltype(*Adc::data_)>::type> Adc::GetAllData() const
-{
-    std::vector<std::remove_reference<decltype(*data_)>::type> result(hadc_->Init.NbrOfConversion);
-    SCB_InvalidateDCache_by_Addr(data_, sizeof(data_));
-    for (size_t i = 0; i < hadc_->Init.NbrOfConversion; i++) {
-        result.at(i) = data_[i];
-    }
-    return result;
+    is_inited_ = true;
+
+    number_of_conversion_ = hadc_->Init.NbrOfConversion;
+    adc_data_             = new std::remove_reference<decltype(*adc_data_)>::type[number_of_conversion_];
+    max_range_            = CalcMaxRange();
+
+    Calibrate();
 }
 
 std::vector<float> Adc::GetAllNormalizedData() const
 {
-    auto all_data = GetAllData();
-    std::vector<float> result(hadc_->Init.NbrOfConversion);
-    auto max_range = GetMaxRange();
-    for (size_t i = 0; i < hadc_->Init.NbrOfConversion; i++) {
-        result.at(i) = (float)all_data.at(i) / max_range;
+    std::vector<float> result(number_of_conversion_);
+    InvalidateDCache();
+    for (size_t i = 0; i < number_of_conversion_; i++) {
+        result.at(i) = (float)adc_data_[i] / max_range_;
     }
 
     return result;
 }
 
-float Adc::GetVoltage(size_t index) const
-{
-    if (index < hadc_->Init.NbrOfConversion) {
-        // 转换到 16 bit 对应的值，再乘以电压系数
-        return __LL_ADC_CONVERT_DATA_RESOLUTION(GetData(index), hadc_->Init.Resolution, LL_ADC_RESOLUTION_16B) * (vref_ / 0xffff);
-    } else {
-        return 0;
-    }
-}
-
 std::vector<float> Adc::GetAllVoltage() const
 {
-    auto adc_data = GetAllData();
-    std::vector<float> result(hadc_->Init.NbrOfConversion);
-    for (size_t i = 0; i < hadc_->Init.NbrOfConversion; i++) {
-        result.at(i) = __LL_ADC_CONVERT_DATA_RESOLUTION(adc_data.at(i), hadc_->Init.Resolution, LL_ADC_RESOLUTION_16B) * (vref_ / 0xffff);
+    std::vector<float> result(number_of_conversion_);
+    InvalidateDCache();
+    for (size_t i = 0; i < number_of_conversion_; i++) {
+        result.at(i) = (float)adc_data_[i] / max_range_ * vref_;
     }
     return result;
 }
@@ -132,8 +102,11 @@ float Adc::GetTemperature(size_t temperature_sensor_index)
      *          TS_CAL2   = equivalent TS_ADC_DATA at temperature
      *                      TEMP_DEGC_CAL2 (calibrated in factory)
      */
-    auto adcValue16Bit = __LL_ADC_CONVERT_DATA_RESOLUTION(GetData(temperature_sensor_index), hadc_->Init.Resolution, LL_ADC_RESOLUTION_16B);
-    return (adcValue16Bit * (vref_ * 1000.0f / TEMPSENSOR_CAL_VREFANALOG) - (*TEMPSENSOR_CAL1_ADDR)) *
-               ((float)(TEMPSENSOR_CAL2_TEMP - TEMPSENSOR_CAL1_TEMP) / (*TEMPSENSOR_CAL2_ADDR - *TEMPSENSOR_CAL1_ADDR)) +
-           TEMPSENSOR_CAL1_TEMP;
+    static const auto FACTOR          = (TEMPSENSOR_CAL2_TEMP - TEMPSENSOR_CAL1_TEMP) / (*TEMPSENSOR_CAL2_ADDR - *TEMPSENSOR_CAL1_ADDR);
+    static const auto TEMPSENSOR_CAL1 = *TEMPSENSOR_CAL1_ADDR;
+    static const float VOLTAGE_FACTOR = vref_ * 1000.0f / TEMPSENSOR_CAL_VREFANALOG;
+
+    auto adc_value_16bit = __LL_ADC_CONVERT_DATA_RESOLUTION(GetData(temperature_sensor_index), hadc_->Init.Resolution, LL_ADC_RESOLUTION_16B);
+
+    return (adc_value_16bit * VOLTAGE_FACTOR - TEMPSENSOR_CAL1) * FACTOR + TEMPSENSOR_CAL1_TEMP;
 }

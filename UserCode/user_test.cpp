@@ -50,12 +50,17 @@ void TestThreadEntry(void *argument)
         stringstream sstr;
         sstr.precision(6);
         sstr.setf(std::ios::fixed);
-        sstr << JoystickL.Pos().x << " " << JoystickL.Pos().y << "\t";
-        sstr << JoystickR.Pos().x << " " << JoystickR.Pos().y;
+
+        auto pos = JoystickL.Pos();
+        sstr << pos.x << " " << pos.y << "\t";
+
+        pos = JoystickR.Pos();
+        sstr << pos.x << " " << pos.y;
+
         sstr << endl;
-        sstr << JoystickL.RawPos().x << " " << JoystickL.RawPos().y << "\t";
-        sstr << JoystickR.RawPos().x << " " << JoystickR.RawPos().y;
-        sstr << endl;
+        // sstr << JoystickL.RawPos().x << " " << JoystickL.RawPos().y << "\t";
+        // sstr << JoystickR.RawPos().x << " " << JoystickR.RawPos().y;
+        // sstr << endl;
 
         // for (auto &volt : Adc1.GetAllVoltage()) {
         //     sstr << volt << " ";
@@ -65,11 +70,11 @@ void TestThreadEntry(void *argument)
         // }
         // sstr << endl;
 
-        sstr << battery.GetVoltage();
+        // sstr << battery.GetVoltage();
 
         LvglLock();
         lv_textarea_set_text(text, sstr.str().c_str());
         LvglUnlock();
-        vTaskDelayUntil(&PreviousWakeTime, 100);
+        vTaskDelayUntil(&PreviousWakeTime, 20);
     }
 }

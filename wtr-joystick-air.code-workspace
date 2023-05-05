@@ -65,7 +65,8 @@
             "cinttypes": "cpp",
             "typeinfo": "cpp",
             "sstream": "cpp",
-            "istream": "cpp"
+            "istream": "cpp",
+            "numbers": "cpp"
         },
         "[yaml]": {
             "editor.insertSpaces": true,
