@@ -9,6 +9,7 @@
 #include "Adc/adc_class_define.hpp"
 #include "Battery/battery_define.hpp"
 #include "Joystick/joystick_define.hpp"
+#include "Encoder/encoder_define.hpp"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -52,22 +53,15 @@ void TestThreadEntry(void *argument)
         sstr.setf(std::ios::fixed);
 
         auto pos = JoystickL.Pos();
-        sstr << pos.x << " " << pos.y << "\t";
+        sstr << pos.x << " " << pos.y << "    ";
 
         pos = JoystickR.Pos();
         sstr << pos.x << " " << pos.y;
 
         sstr << endl;
-        // sstr << JoystickL.RawPos().x << " " << JoystickL.RawPos().y << "\t";
-        // sstr << JoystickR.RawPos().x << " " << JoystickR.RawPos().y;
-        // sstr << endl;
 
-        // for (auto &volt : Adc1.GetAllVoltage()) {
-        //     sstr << volt << " ";
-        // }
-        // for (auto &volt : Adc2.GetAllVoltage()) {
-        //     sstr << volt << " ";
-        // }
+        sstr << KnobEncoderL.Count() << " " << KnobEncoderL.ErrorCount() << "    ";
+        sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
         sstr << endl;
 
         sstr << battery.GetVoltage();
@@ -75,6 +69,6 @@ void TestThreadEntry(void *argument)
         LvglLock();
         lv_textarea_set_text(text, sstr.str().c_str());
         LvglUnlock();
-        vTaskDelayUntil(&PreviousWakeTime, 20);
+        vTaskDelayUntil(&PreviousWakeTime, 40);
     }
 }
