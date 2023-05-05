@@ -55,15 +55,13 @@ void TestThreadEntry(void *argument)
         sstr.precision(6);
         sstr.setf(std::ios::fixed);
 
-        // auto pos = JoystickL.Pos();
-        // sstr << pos.x << " " << pos.y << "    ";
+        auto pos = JoystickL.Pos();
+        sstr << pos.x << " " << pos.y << "    ";
 
-        // pos = JoystickR.Pos();
-        // sstr << pos.x << " " << pos.y;
+        pos = JoystickR.Pos();
+        sstr << pos.x << " " << pos.y;
 
-        // sstr << HAL_GPIO_ReadPin(KnobL_A_GPIO_Port, KnobL_A_Pin);
-
-        // sstr << endl;
+        sstr << endl;
 
         sstr << KnobEncoderL.Count() << " " << KnobEncoderL.ErrorCount() << "    ";
         sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
