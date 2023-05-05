@@ -28,16 +28,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     switch (GPIO_Pin) {
         case KnobL_A_Pin:
-            KnobEncoderL.ExtiCallback(HAL_GPIO_ReadPin(KnobL_A_GPIO_Port, KnobL_A_Pin), HAL_GPIO_ReadPin(KnobL_B_GPIO_Port, KnobL_B_Pin));
+            KnobEncoderL.ExtiCallback();
             break;
         case KnobL_B_Pin:
-            KnobEncoderL.ExtiCallback(HAL_GPIO_ReadPin(KnobL_A_GPIO_Port, KnobL_A_Pin), HAL_GPIO_ReadPin(KnobL_B_GPIO_Port, KnobL_B_Pin));
+            KnobEncoderL.ExtiCallback();
             break;
         case KnobR_A_Pin:
-            KnobEncoderR.ExtiCallback(HAL_GPIO_ReadPin(KnobR_A_GPIO_Port, KnobR_A_Pin), HAL_GPIO_ReadPin(KnobR_B_GPIO_Port, KnobR_B_Pin));
+            KnobEncoderR.ExtiCallback();
             break;
         case KnobR_B_Pin:
-            KnobEncoderR.ExtiCallback(HAL_GPIO_ReadPin(KnobR_A_GPIO_Port, KnobR_A_Pin), HAL_GPIO_ReadPin(KnobR_B_GPIO_Port, KnobR_B_Pin));
+            KnobEncoderR.ExtiCallback();
             break;
 
         default:

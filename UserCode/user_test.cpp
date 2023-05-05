@@ -38,6 +38,9 @@ void TestThreadEntry(void *argument)
     JoystickR.y_min    = 0;
     JoystickR.Init();
 
+    KnobEncoderL.Init();
+    KnobEncoderR.Init();
+
     LvglLock();
 
     auto text = lv_textarea_create(lv_scr_act());
@@ -52,13 +55,15 @@ void TestThreadEntry(void *argument)
         sstr.precision(6);
         sstr.setf(std::ios::fixed);
 
-        auto pos = JoystickL.Pos();
-        sstr << pos.x << " " << pos.y << "    ";
+        // auto pos = JoystickL.Pos();
+        // sstr << pos.x << " " << pos.y << "    ";
 
-        pos = JoystickR.Pos();
-        sstr << pos.x << " " << pos.y;
+        // pos = JoystickR.Pos();
+        // sstr << pos.x << " " << pos.y;
 
-        sstr << endl;
+        // sstr << HAL_GPIO_ReadPin(KnobL_A_GPIO_Port, KnobL_A_Pin);
+
+        // sstr << endl;
 
         sstr << KnobEncoderL.Count() << " " << KnobEncoderL.ErrorCount() << "    ";
         sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
