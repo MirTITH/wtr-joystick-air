@@ -11,11 +11,14 @@
 #include "Joystick/joystick_define.hpp"
 #include "Encoder/encoder_define.hpp"
 #include "HighPrecisionTime/high_precision_time.h"
+#include "Button/joystick_button.hpp"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
 
 using namespace std;
+
+lv_obj_t *ScreenText;
 
 void TestThreadEntry(void *argument)
 {
@@ -44,53 +47,52 @@ void TestThreadEntry(void *argument)
 
     LvglLock();
 
-    auto text = lv_textarea_create(lv_scr_act());
-    lv_obj_set_size(text, lv_pct(100), lv_pct(100));
+    ScreenText = lv_textarea_create(lv_scr_act());
+    lv_obj_set_size(ScreenText, lv_pct(100), lv_pct(100));
 
-    uint64_t start_ns, end_ns, self_ns;
+    // uint64_t start_ns, end_ns, self_ns;
 
-    uint32_t sum_ns       = 0;
-    uint32_t sum_ns_count = 0;
+    // uint32_t sum_ns       = 0;
+    // uint32_t sum_ns_count = 0;
 
     LvglUnlock();
 
+    JoystickButtonInit();
+
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
-    stringstream sstr;
-    sstr.precision(6);
-    sstr.setf(std::ios::fixed);
-
     while (true) {
-        start_ns = HPT_GetNs();
-        self_ns  = HPT_GetNs();
+        // start_ns = HPT_GetNs();
+        // self_ns  = HPT_GetNs();
 
-        sstr.str("");
+        // sstr.str("");
 
-        auto pos = JoystickL.Pos();
+        // auto pos = JoystickL.Pos();
 
-        sstr << pos.x << " " << pos.y << "    ";
+        // sstr << pos.x << " " << pos.y << "    ";
 
-        pos = JoystickR.Pos();
-        sstr << pos.x << " " << pos.y;
+        // pos = JoystickR.Pos();
+        // sstr << pos.x << " " << pos.y;
 
-        sstr << endl;
+        // sstr << endl;
 
-        sstr << KnobEncoderL.Count() << " " << KnobEncoderL.ErrorCount() << "    ";
-        sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
-        sstr << endl;
+        // sstr << KnobEncoderL.Count() << " " << KnobEncoderL.ErrorCount() << "    ";
+        // sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
+        // sstr << endl;
 
-        sstr << battery.GetVoltage() << endl;
+        // sstr << battery.GetVoltage() << endl;
 
-        end_ns = HPT_GetNs();
+        // end_ns = HPT_GetNs();
 
-        sum_ns += end_ns - self_ns - (self_ns - start_ns);
-        sum_ns_count++;
+        // sum_ns += end_ns - self_ns - (self_ns - start_ns);
+        // sum_ns_count++;
 
-        sstr << "self:" << self_ns - start_ns << " time:" << sum_ns / sum_ns_count;
+        // sstr << "self:" << self_ns - start_ns << " time:" << sum_ns / sum_ns_count;
 
-        LvglLock();
-        lv_textarea_set_text(text, sstr.str().c_str());
-        LvglUnlock();
-        vTaskDelayUntil(&PreviousWakeTime, 40);
+        // LvglLock();
+        // lv_textarea_set_text(text, sstr.str().c_str());
+        // LvglUnlock();
+        flex_button_scan();
+        vTaskDelayUntil(&PreviousWakeTime, 20);
     }
 }

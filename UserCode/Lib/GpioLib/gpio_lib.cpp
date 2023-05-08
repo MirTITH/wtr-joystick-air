@@ -1,7 +1,7 @@
 #include "gpio_lib.hpp"
 #include "HighPrecisionTime/high_precision_time.h"
 
-GPIO_PinState GpioLib::ReadPinAntiShake(Gpio_t gpio, uint32_t sample_time_us)
+GPIO_PinState GpioLib::ReadPinAntiShake(Gpio_t &gpio, uint32_t sample_time_us)
 {
     return ReadPinAntiShake(gpio.GPIOx, gpio.GPIO_Pin, sample_time_us);
 }
@@ -20,9 +20,9 @@ GPIO_PinState GpioLib::ReadPinAntiShake(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, 
     return (pin_sum > sum_count / 2) ? GPIO_PIN_SET : GPIO_PIN_RESET;
 }
 
-std::vector<GPIO_PinState> GpioLib::ReadPinsAntiShake(std::vector<Gpio_t> gpios, uint32_t sample_time_us)
+void GpioLib::ReadPinsAntiShake(std::vector<Gpio_t> &gpios, std::vector<GPIO_PinState> &result, uint32_t sample_time_us)
 {
-    std::vector<GPIO_PinState> result(gpios.size());
+    result.resize(gpios.size());
     std::vector<uint32_t> pin_sum(gpios.size(), 0);
     uint32_t sum_count = 0;
     auto prev_us       = HPT_GetUs();
@@ -37,5 +37,4 @@ std::vector<GPIO_PinState> GpioLib::ReadPinsAntiShake(std::vector<Gpio_t> gpios,
     for (size_t i = 0; i < gpios.size(); i++) {
         result.at(i) = (pin_sum.at(i) > sum_count / 2) ? GPIO_PIN_SET : GPIO_PIN_RESET;
     }
-    return result;
 }

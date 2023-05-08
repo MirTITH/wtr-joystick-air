@@ -67,7 +67,10 @@
             "sstream": "cpp",
             "istream": "cpp",
             "numbers": "cpp",
-            "iostream": "cpp"
+            "iostream": "cpp",
+            "chrono": "cpp",
+            "ctime": "cpp",
+            "ratio": "cpp"
         },
         "[yaml]": {
             "editor.insertSpaces": true,
