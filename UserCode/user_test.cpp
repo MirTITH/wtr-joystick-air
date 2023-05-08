@@ -10,6 +10,7 @@
 #include "Battery/battery_define.hpp"
 #include "Joystick/joystick_define.hpp"
 #include "Encoder/encoder_define.hpp"
+#include "HighPrecisionTime/high_precision_time.h"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -46,16 +47,27 @@ void TestThreadEntry(void *argument)
     auto text = lv_textarea_create(lv_scr_act());
     lv_obj_set_size(text, lv_pct(100), lv_pct(100));
 
+    uint64_t start_ns, end_ns, self_ns;
+
+    uint32_t sum_ns       = 0;
+    uint32_t sum_ns_count = 0;
+
     LvglUnlock();
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
+    stringstream sstr;
+    sstr.precision(6);
+    sstr.setf(std::ios::fixed);
+
     while (true) {
-        stringstream sstr;
-        sstr.precision(6);
-        sstr.setf(std::ios::fixed);
+        start_ns = HPT_GetNs();
+        self_ns  = HPT_GetNs();
+
+        sstr.str("");
 
         auto pos = JoystickL.Pos();
+
         sstr << pos.x << " " << pos.y << "    ";
 
         pos = JoystickR.Pos();
@@ -67,7 +79,14 @@ void TestThreadEntry(void *argument)
         sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
         sstr << endl;
 
-        sstr << battery.GetVoltage();
+        sstr << battery.GetVoltage() << endl;
+
+        end_ns = HPT_GetNs();
+
+        sum_ns += end_ns - self_ns - (self_ns - start_ns);
+        sum_ns_count++;
+
+        sstr << "self:" << self_ns - start_ns << " time:" << sum_ns / sum_ns_count;
 
         LvglLock();
         lv_textarea_set_text(text, sstr.str().c_str());
