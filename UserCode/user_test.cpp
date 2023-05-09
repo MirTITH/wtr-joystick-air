@@ -59,7 +59,6 @@ void TestThreadEntry(void *argument)
     LvglUnlock();
 
     JoystickButtonInit();
-    MatrixKeyboard_Init();
 
     stringstream sstr;
 
@@ -98,37 +97,10 @@ void TestThreadEntry(void *argument)
             sstr << ((result & (1 << i)) != 0);
         }
 
-        sstr << endl;
-
-        SetRow(0);
-        vTaskDelay(2);
-        sstr << HAL_GPIO_ReadPin(Kb_MC1_GPIO_Port, Kb_MC1_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MC2_GPIO_Port, Kb_MC2_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MC3_GPIO_Port, Kb_MC3_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MC4_GPIO_Port, Kb_MC4_Pin);
-        sstr << " ";
-        sstr << HAL_GPIO_ReadPin(Kb_MR1_GPIO_Port, Kb_MR1_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MR2_GPIO_Port, Kb_MR2_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MR3_GPIO_Port, Kb_MR3_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MR4_GPIO_Port, Kb_MR4_Pin);
-        sstr << endl;
-
-        SetRow(2);
-        vTaskDelay(2);
-        sstr << HAL_GPIO_ReadPin(Kb_MC1_GPIO_Port, Kb_MC1_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MC2_GPIO_Port, Kb_MC2_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MC3_GPIO_Port, Kb_MC3_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MC4_GPIO_Port, Kb_MC4_Pin);
-        sstr << " ";
-        sstr << HAL_GPIO_ReadPin(Kb_MR1_GPIO_Port, Kb_MR1_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MR2_GPIO_Port, Kb_MR2_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MR3_GPIO_Port, Kb_MR3_Pin);
-        sstr << HAL_GPIO_ReadPin(Kb_MR4_GPIO_Port, Kb_MR4_Pin);
-
         LvglLock();
         lv_textarea_set_text(ScreenText, sstr.str().c_str());
         LvglUnlock();
         // flex_button_scan();
-        vTaskDelayUntil(&PreviousWakeTime, 50);
+        vTaskDelayUntil(&PreviousWakeTime, 20);
     }
 }
