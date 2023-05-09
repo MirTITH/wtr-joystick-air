@@ -118,6 +118,8 @@ int main(void)
   MX_I2C2_Init();
   MX_FMC_Init();
   MX_ADC2_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

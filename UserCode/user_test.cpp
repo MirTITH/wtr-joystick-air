@@ -12,6 +12,7 @@
 #include "Encoder/encoder_define.hpp"
 #include "HighPrecisionTime/high_precision_time.h"
 #include "Button/buttons.h"
+#include "Led/led_define.hpp"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -34,7 +35,7 @@ void TestThreadEntry(void *argument)
     JoystickL.y_min    = 0;
     JoystickL.Init();
 
-    JoystickR.x_max    = 0.7;
+    JoystickR.x_max    = 1;
     JoystickR.x_middle = 0.526;
     JoystickR.x_min    = 0;
     JoystickR.y_max    = 0.9995;
@@ -60,8 +61,11 @@ void TestThreadEntry(void *argument)
     Buttons_Init();
 
     stringstream sstr;
-
     sstr.precision(4);
+
+    KeyboardLed.Init();
+
+    float r = 0, g = 0, b = 0, lightfactor = 1;
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
@@ -82,6 +86,16 @@ void TestThreadEntry(void *argument)
         // sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
         // sstr << endl;
 
+        // switch (expression)
+        // {
+        // case /* constant-expression */:
+        //     /* code */
+        //     break;
+
+        // default:
+        //     break;
+        // }
+
         sstr << "Voltage: " << battery.GetVoltage() << "V; "
              << "Single battery: " << battery.GetVoltage() / 2 << "V" << endl;
 
@@ -96,6 +110,36 @@ void TestThreadEntry(void *argument)
         sum_ns_count++;
 
         sstr << "time:" << end_ns - self_ns - (self_ns - start_ns) << " avg time:" << sum_ns / sum_ns_count;
+
+        if (Buttons_Read(Btn_LeftCrossUp)) {
+            g += 0.001;
+        }
+        if (Buttons_Read(Btn_LeftCrossDown)) {
+            g -= 0.001;
+        }
+        if (Buttons_Read(Btn_LeftCrossLeft)) {
+            b -= 0.001;
+        }
+        if (Buttons_Read(Btn_LeftCrossRight)) {
+            b += 0.001;
+        }
+        if (Buttons_Read(Btn_RightCrossLeft)) {
+            r -= 0.001;
+        }
+        if (Buttons_Read(Btn_RightCrossRight)) {
+            r += 0.001;
+        }
+        if (Buttons_Read(Btn_RightCrossUp)) {
+            lightfactor += 0.01;
+        }
+        if (Buttons_Read(Btn_RightCrossDown)) {
+            lightfactor -= 0.01;
+        }
+
+        KeyboardLed.SetColor(r, g, b, lightfactor);
+
+        sstr << endl;
+        sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor;
         // sstr << std::hex << (int);
 
         LvglLock();

@@ -26,8 +26,8 @@ extern "C" {
 #endif
 
 void Buttons_Init();
-
 void Buttons_Scan();
+uint8_t Buttons_Read(uint8_t Btn);
 
 #ifdef __cplusplus
 }
