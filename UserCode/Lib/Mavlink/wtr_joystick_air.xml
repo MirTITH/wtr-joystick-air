@@ -7,7 +7,8 @@
             <field type="uint8_t[20]" name="buttons"> Buttons </field>
             <field type="uint8_t" name="switchs"> bit0: left sw. bit1: right sw </field>
             <field type="int16_t[2]" name="knobs"> [0]: left knob. [1]: right knob </field>
-            <field type="float[2]" name="joysticks"> [0]: left joystick. [1]: right joystick </field>
+            <field type="float[2]" name="joystickL"> [0]: x pos [1]: y pos </field>
+            <field type="float[2]" name="joystickR"> [0]: x pos [1]: y pos </field>
         </message>
         <message id="210" name="JOYSTICK_AIR_LED">
             <description>RGB led on remote controller</description>

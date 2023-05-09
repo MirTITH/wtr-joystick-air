@@ -37,13 +37,14 @@ static void mavlink_test_joystick_air(uint8_t system_id, uint8_t component_id, m
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
     mavlink_joystick_air_t packet_in = {
-        { 17.0, 18.0 },{ 17651, 17652 },{ 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60 },101
+        { 17.0, 18.0 },{ 73.0, 74.0 },{ 18067, 18068 },{ 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84 },125
     };
     mavlink_joystick_air_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
         packet1.switchs = packet_in.switchs;
         
-        mav_array_memcpy(packet1.joysticks, packet_in.joysticks, sizeof(float)*2);
+        mav_array_memcpy(packet1.joystickL, packet_in.joystickL, sizeof(float)*2);
+        mav_array_memcpy(packet1.joystickR, packet_in.joystickR, sizeof(float)*2);
         mav_array_memcpy(packet1.knobs, packet_in.knobs, sizeof(int16_t)*2);
         mav_array_memcpy(packet1.buttons, packet_in.buttons, sizeof(uint8_t)*20);
         
@@ -59,12 +60,12 @@ static void mavlink_test_joystick_air(uint8_t system_id, uint8_t component_id, m
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
         memset(&packet2, 0, sizeof(packet2));
-    mavlink_msg_joystick_air_pack(system_id, component_id, &msg , packet1.buttons , packet1.switchs , packet1.knobs , packet1.joysticks );
+    mavlink_msg_joystick_air_pack(system_id, component_id, &msg , packet1.buttons , packet1.switchs , packet1.knobs , packet1.joystickL , packet1.joystickR );
     mavlink_msg_joystick_air_decode(&msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
         memset(&packet2, 0, sizeof(packet2));
-    mavlink_msg_joystick_air_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.buttons , packet1.switchs , packet1.knobs , packet1.joysticks );
+    mavlink_msg_joystick_air_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.buttons , packet1.switchs , packet1.knobs , packet1.joystickL , packet1.joystickR );
     mavlink_msg_joystick_air_decode(&msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
@@ -77,7 +78,7 @@ static void mavlink_test_joystick_air(uint8_t system_id, uint8_t component_id, m
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
         
         memset(&packet2, 0, sizeof(packet2));
-    mavlink_msg_joystick_air_send(MAVLINK_COMM_1 , packet1.buttons , packet1.switchs , packet1.knobs , packet1.joysticks );
+    mavlink_msg_joystick_air_send(MAVLINK_COMM_1 , packet1.buttons , packet1.switchs , packet1.knobs , packet1.joystickL , packet1.joystickR );
     mavlink_msg_joystick_air_decode(last_msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 

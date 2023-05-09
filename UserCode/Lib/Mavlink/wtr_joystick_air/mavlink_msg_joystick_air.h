@@ -5,21 +5,23 @@
 
 
 typedef struct __mavlink_joystick_air_t {
- float joysticks[2]; /*<   [0]: left joystick. [1]: right joystick */
+ float joystickL[2]; /*<   [0]: x pos [1]: y pos */
+ float joystickR[2]; /*<   [0]: x pos [1]: y pos */
  int16_t knobs[2]; /*<   [0]: left knob. [1]: right knob */
  uint8_t buttons[20]; /*<   Buttons */
  uint8_t switchs; /*<   bit0: left sw. bit1: right sw */
 } mavlink_joystick_air_t;
 
-#define MAVLINK_MSG_ID_JOYSTICK_AIR_LEN 33
-#define MAVLINK_MSG_ID_JOYSTICK_AIR_MIN_LEN 33
-#define MAVLINK_MSG_ID_209_LEN 33
-#define MAVLINK_MSG_ID_209_MIN_LEN 33
+#define MAVLINK_MSG_ID_JOYSTICK_AIR_LEN 41
+#define MAVLINK_MSG_ID_JOYSTICK_AIR_MIN_LEN 41
+#define MAVLINK_MSG_ID_209_LEN 41
+#define MAVLINK_MSG_ID_209_MIN_LEN 41
 
-#define MAVLINK_MSG_ID_JOYSTICK_AIR_CRC 172
-#define MAVLINK_MSG_ID_209_CRC 172
+#define MAVLINK_MSG_ID_JOYSTICK_AIR_CRC 237
+#define MAVLINK_MSG_ID_209_CRC 237
 
-#define MAVLINK_MSG_JOYSTICK_AIR_FIELD_JOYSTICKS_LEN 2
+#define MAVLINK_MSG_JOYSTICK_AIR_FIELD_JOYSTICKL_LEN 2
+#define MAVLINK_MSG_JOYSTICK_AIR_FIELD_JOYSTICKR_LEN 2
 #define MAVLINK_MSG_JOYSTICK_AIR_FIELD_KNOBS_LEN 2
 #define MAVLINK_MSG_JOYSTICK_AIR_FIELD_BUTTONS_LEN 20
 
@@ -27,21 +29,23 @@ typedef struct __mavlink_joystick_air_t {
 #define MAVLINK_MESSAGE_INFO_JOYSTICK_AIR { \
     209, \
     "JOYSTICK_AIR", \
-    4, \
-    {  { "buttons", NULL, MAVLINK_TYPE_UINT8_T, 20, 12, offsetof(mavlink_joystick_air_t, buttons) }, \
-         { "switchs", NULL, MAVLINK_TYPE_UINT8_T, 0, 32, offsetof(mavlink_joystick_air_t, switchs) }, \
-         { "knobs", NULL, MAVLINK_TYPE_INT16_T, 2, 8, offsetof(mavlink_joystick_air_t, knobs) }, \
-         { "joysticks", NULL, MAVLINK_TYPE_FLOAT, 2, 0, offsetof(mavlink_joystick_air_t, joysticks) }, \
+    5, \
+    {  { "buttons", NULL, MAVLINK_TYPE_UINT8_T, 20, 20, offsetof(mavlink_joystick_air_t, buttons) }, \
+         { "switchs", NULL, MAVLINK_TYPE_UINT8_T, 0, 40, offsetof(mavlink_joystick_air_t, switchs) }, \
+         { "knobs", NULL, MAVLINK_TYPE_INT16_T, 2, 16, offsetof(mavlink_joystick_air_t, knobs) }, \
+         { "joystickL", NULL, MAVLINK_TYPE_FLOAT, 2, 0, offsetof(mavlink_joystick_air_t, joystickL) }, \
+         { "joystickR", NULL, MAVLINK_TYPE_FLOAT, 2, 8, offsetof(mavlink_joystick_air_t, joystickR) }, \
          } \
 }
 #else
 #define MAVLINK_MESSAGE_INFO_JOYSTICK_AIR { \
     "JOYSTICK_AIR", \
-    4, \
-    {  { "buttons", NULL, MAVLINK_TYPE_UINT8_T, 20, 12, offsetof(mavlink_joystick_air_t, buttons) }, \
-         { "switchs", NULL, MAVLINK_TYPE_UINT8_T, 0, 32, offsetof(mavlink_joystick_air_t, switchs) }, \
-         { "knobs", NULL, MAVLINK_TYPE_INT16_T, 2, 8, offsetof(mavlink_joystick_air_t, knobs) }, \
-         { "joysticks", NULL, MAVLINK_TYPE_FLOAT, 2, 0, offsetof(mavlink_joystick_air_t, joysticks) }, \
+    5, \
+    {  { "buttons", NULL, MAVLINK_TYPE_UINT8_T, 20, 20, offsetof(mavlink_joystick_air_t, buttons) }, \
+         { "switchs", NULL, MAVLINK_TYPE_UINT8_T, 0, 40, offsetof(mavlink_joystick_air_t, switchs) }, \
+         { "knobs", NULL, MAVLINK_TYPE_INT16_T, 2, 16, offsetof(mavlink_joystick_air_t, knobs) }, \
+         { "joystickL", NULL, MAVLINK_TYPE_FLOAT, 2, 0, offsetof(mavlink_joystick_air_t, joystickL) }, \
+         { "joystickR", NULL, MAVLINK_TYPE_FLOAT, 2, 8, offsetof(mavlink_joystick_air_t, joystickR) }, \
          } \
 }
 #endif
@@ -55,23 +59,26 @@ typedef struct __mavlink_joystick_air_t {
  * @param buttons   Buttons 
  * @param switchs   bit0: left sw. bit1: right sw 
  * @param knobs   [0]: left knob. [1]: right knob 
- * @param joysticks   [0]: left joystick. [1]: right joystick 
+ * @param joystickL   [0]: x pos [1]: y pos 
+ * @param joystickR   [0]: x pos [1]: y pos 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_joystick_air_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               const uint8_t *buttons, uint8_t switchs, const int16_t *knobs, const float *joysticks)
+                               const uint8_t *buttons, uint8_t switchs, const int16_t *knobs, const float *joystickL, const float *joystickR)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_JOYSTICK_AIR_LEN];
-    _mav_put_uint8_t(buf, 32, switchs);
-    _mav_put_float_array(buf, 0, joysticks, 2);
-    _mav_put_int16_t_array(buf, 8, knobs, 2);
-    _mav_put_uint8_t_array(buf, 12, buttons, 20);
+    _mav_put_uint8_t(buf, 40, switchs);
+    _mav_put_float_array(buf, 0, joystickL, 2);
+    _mav_put_float_array(buf, 8, joystickR, 2);
+    _mav_put_int16_t_array(buf, 16, knobs, 2);
+    _mav_put_uint8_t_array(buf, 20, buttons, 20);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN);
 #else
     mavlink_joystick_air_t packet;
     packet.switchs = switchs;
-    mav_array_memcpy(packet.joysticks, joysticks, sizeof(float)*2);
+    mav_array_memcpy(packet.joystickL, joystickL, sizeof(float)*2);
+    mav_array_memcpy(packet.joystickR, joystickR, sizeof(float)*2);
     mav_array_memcpy(packet.knobs, knobs, sizeof(int16_t)*2);
     mav_array_memcpy(packet.buttons, buttons, sizeof(uint8_t)*20);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN);
@@ -90,24 +97,27 @@ static inline uint16_t mavlink_msg_joystick_air_pack(uint8_t system_id, uint8_t 
  * @param buttons   Buttons 
  * @param switchs   bit0: left sw. bit1: right sw 
  * @param knobs   [0]: left knob. [1]: right knob 
- * @param joysticks   [0]: left joystick. [1]: right joystick 
+ * @param joystickL   [0]: x pos [1]: y pos 
+ * @param joystickR   [0]: x pos [1]: y pos 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_joystick_air_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
                                mavlink_message_t* msg,
-                                   const uint8_t *buttons,uint8_t switchs,const int16_t *knobs,const float *joysticks)
+                                   const uint8_t *buttons,uint8_t switchs,const int16_t *knobs,const float *joystickL,const float *joystickR)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_JOYSTICK_AIR_LEN];
-    _mav_put_uint8_t(buf, 32, switchs);
-    _mav_put_float_array(buf, 0, joysticks, 2);
-    _mav_put_int16_t_array(buf, 8, knobs, 2);
-    _mav_put_uint8_t_array(buf, 12, buttons, 20);
+    _mav_put_uint8_t(buf, 40, switchs);
+    _mav_put_float_array(buf, 0, joystickL, 2);
+    _mav_put_float_array(buf, 8, joystickR, 2);
+    _mav_put_int16_t_array(buf, 16, knobs, 2);
+    _mav_put_uint8_t_array(buf, 20, buttons, 20);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN);
 #else
     mavlink_joystick_air_t packet;
     packet.switchs = switchs;
-    mav_array_memcpy(packet.joysticks, joysticks, sizeof(float)*2);
+    mav_array_memcpy(packet.joystickL, joystickL, sizeof(float)*2);
+    mav_array_memcpy(packet.joystickR, joystickR, sizeof(float)*2);
     mav_array_memcpy(packet.knobs, knobs, sizeof(int16_t)*2);
     mav_array_memcpy(packet.buttons, buttons, sizeof(uint8_t)*20);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN);
@@ -127,7 +137,7 @@ static inline uint16_t mavlink_msg_joystick_air_pack_chan(uint8_t system_id, uin
  */
 static inline uint16_t mavlink_msg_joystick_air_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_joystick_air_t* joystick_air)
 {
-    return mavlink_msg_joystick_air_pack(system_id, component_id, msg, joystick_air->buttons, joystick_air->switchs, joystick_air->knobs, joystick_air->joysticks);
+    return mavlink_msg_joystick_air_pack(system_id, component_id, msg, joystick_air->buttons, joystick_air->switchs, joystick_air->knobs, joystick_air->joystickL, joystick_air->joystickR);
 }
 
 /**
@@ -141,7 +151,7 @@ static inline uint16_t mavlink_msg_joystick_air_encode(uint8_t system_id, uint8_
  */
 static inline uint16_t mavlink_msg_joystick_air_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_joystick_air_t* joystick_air)
 {
-    return mavlink_msg_joystick_air_pack_chan(system_id, component_id, chan, msg, joystick_air->buttons, joystick_air->switchs, joystick_air->knobs, joystick_air->joysticks);
+    return mavlink_msg_joystick_air_pack_chan(system_id, component_id, chan, msg, joystick_air->buttons, joystick_air->switchs, joystick_air->knobs, joystick_air->joystickL, joystick_air->joystickR);
 }
 
 /**
@@ -151,23 +161,26 @@ static inline uint16_t mavlink_msg_joystick_air_encode_chan(uint8_t system_id, u
  * @param buttons   Buttons 
  * @param switchs   bit0: left sw. bit1: right sw 
  * @param knobs   [0]: left knob. [1]: right knob 
- * @param joysticks   [0]: left joystick. [1]: right joystick 
+ * @param joystickL   [0]: x pos [1]: y pos 
+ * @param joystickR   [0]: x pos [1]: y pos 
  */
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
-static inline void mavlink_msg_joystick_air_send(mavlink_channel_t chan, const uint8_t *buttons, uint8_t switchs, const int16_t *knobs, const float *joysticks)
+static inline void mavlink_msg_joystick_air_send(mavlink_channel_t chan, const uint8_t *buttons, uint8_t switchs, const int16_t *knobs, const float *joystickL, const float *joystickR)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_JOYSTICK_AIR_LEN];
-    _mav_put_uint8_t(buf, 32, switchs);
-    _mav_put_float_array(buf, 0, joysticks, 2);
-    _mav_put_int16_t_array(buf, 8, knobs, 2);
-    _mav_put_uint8_t_array(buf, 12, buttons, 20);
+    _mav_put_uint8_t(buf, 40, switchs);
+    _mav_put_float_array(buf, 0, joystickL, 2);
+    _mav_put_float_array(buf, 8, joystickR, 2);
+    _mav_put_int16_t_array(buf, 16, knobs, 2);
+    _mav_put_uint8_t_array(buf, 20, buttons, 20);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR, buf, MAVLINK_MSG_ID_JOYSTICK_AIR_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_CRC);
 #else
     mavlink_joystick_air_t packet;
     packet.switchs = switchs;
-    mav_array_memcpy(packet.joysticks, joysticks, sizeof(float)*2);
+    mav_array_memcpy(packet.joystickL, joystickL, sizeof(float)*2);
+    mav_array_memcpy(packet.joystickR, joystickR, sizeof(float)*2);
     mav_array_memcpy(packet.knobs, knobs, sizeof(int16_t)*2);
     mav_array_memcpy(packet.buttons, buttons, sizeof(uint8_t)*20);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR, (const char *)&packet, MAVLINK_MSG_ID_JOYSTICK_AIR_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_CRC);
@@ -182,7 +195,7 @@ static inline void mavlink_msg_joystick_air_send(mavlink_channel_t chan, const u
 static inline void mavlink_msg_joystick_air_send_struct(mavlink_channel_t chan, const mavlink_joystick_air_t* joystick_air)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    mavlink_msg_joystick_air_send(chan, joystick_air->buttons, joystick_air->switchs, joystick_air->knobs, joystick_air->joysticks);
+    mavlink_msg_joystick_air_send(chan, joystick_air->buttons, joystick_air->switchs, joystick_air->knobs, joystick_air->joystickL, joystick_air->joystickR);
 #else
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR, (const char *)joystick_air, MAVLINK_MSG_ID_JOYSTICK_AIR_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_CRC);
 #endif
@@ -196,19 +209,21 @@ static inline void mavlink_msg_joystick_air_send_struct(mavlink_channel_t chan, 
   is usually the receive buffer for the channel, and allows a reply to an
   incoming message with minimum stack space usage.
  */
-static inline void mavlink_msg_joystick_air_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  const uint8_t *buttons, uint8_t switchs, const int16_t *knobs, const float *joysticks)
+static inline void mavlink_msg_joystick_air_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  const uint8_t *buttons, uint8_t switchs, const int16_t *knobs, const float *joystickL, const float *joystickR)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char *buf = (char *)msgbuf;
-    _mav_put_uint8_t(buf, 32, switchs);
-    _mav_put_float_array(buf, 0, joysticks, 2);
-    _mav_put_int16_t_array(buf, 8, knobs, 2);
-    _mav_put_uint8_t_array(buf, 12, buttons, 20);
+    _mav_put_uint8_t(buf, 40, switchs);
+    _mav_put_float_array(buf, 0, joystickL, 2);
+    _mav_put_float_array(buf, 8, joystickR, 2);
+    _mav_put_int16_t_array(buf, 16, knobs, 2);
+    _mav_put_uint8_t_array(buf, 20, buttons, 20);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR, buf, MAVLINK_MSG_ID_JOYSTICK_AIR_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_CRC);
 #else
     mavlink_joystick_air_t *packet = (mavlink_joystick_air_t *)msgbuf;
     packet->switchs = switchs;
-    mav_array_memcpy(packet->joysticks, joysticks, sizeof(float)*2);
+    mav_array_memcpy(packet->joystickL, joystickL, sizeof(float)*2);
+    mav_array_memcpy(packet->joystickR, joystickR, sizeof(float)*2);
     mav_array_memcpy(packet->knobs, knobs, sizeof(int16_t)*2);
     mav_array_memcpy(packet->buttons, buttons, sizeof(uint8_t)*20);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR, (const char *)packet, MAVLINK_MSG_ID_JOYSTICK_AIR_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_CRC);
@@ -228,7 +243,7 @@ static inline void mavlink_msg_joystick_air_send_buf(mavlink_message_t *msgbuf, 
  */
 static inline uint16_t mavlink_msg_joystick_air_get_buttons(const mavlink_message_t* msg, uint8_t *buttons)
 {
-    return _MAV_RETURN_uint8_t_array(msg, buttons, 20,  12);
+    return _MAV_RETURN_uint8_t_array(msg, buttons, 20,  20);
 }
 
 /**
@@ -238,7 +253,7 @@ static inline uint16_t mavlink_msg_joystick_air_get_buttons(const mavlink_messag
  */
 static inline uint8_t mavlink_msg_joystick_air_get_switchs(const mavlink_message_t* msg)
 {
-    return _MAV_RETURN_uint8_t(msg,  32);
+    return _MAV_RETURN_uint8_t(msg,  40);
 }
 
 /**
@@ -248,17 +263,27 @@ static inline uint8_t mavlink_msg_joystick_air_get_switchs(const mavlink_message
  */
 static inline uint16_t mavlink_msg_joystick_air_get_knobs(const mavlink_message_t* msg, int16_t *knobs)
 {
-    return _MAV_RETURN_int16_t_array(msg, knobs, 2,  8);
+    return _MAV_RETURN_int16_t_array(msg, knobs, 2,  16);
 }
 
 /**
- * @brief Get field joysticks from joystick_air message
+ * @brief Get field joystickL from joystick_air message
  *
- * @return   [0]: left joystick. [1]: right joystick 
+ * @return   [0]: x pos [1]: y pos 
  */
-static inline uint16_t mavlink_msg_joystick_air_get_joysticks(const mavlink_message_t* msg, float *joysticks)
+static inline uint16_t mavlink_msg_joystick_air_get_joystickL(const mavlink_message_t* msg, float *joystickL)
 {
-    return _MAV_RETURN_float_array(msg, joysticks, 2,  0);
+    return _MAV_RETURN_float_array(msg, joystickL, 2,  0);
+}
+
+/**
+ * @brief Get field joystickR from joystick_air message
+ *
+ * @return   [0]: x pos [1]: y pos 
+ */
+static inline uint16_t mavlink_msg_joystick_air_get_joystickR(const mavlink_message_t* msg, float *joystickR)
+{
+    return _MAV_RETURN_float_array(msg, joystickR, 2,  8);
 }
 
 /**
@@ -270,7 +295,8 @@ static inline uint16_t mavlink_msg_joystick_air_get_joysticks(const mavlink_mess
 static inline void mavlink_msg_joystick_air_decode(const mavlink_message_t* msg, mavlink_joystick_air_t* joystick_air)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    mavlink_msg_joystick_air_get_joysticks(msg, joystick_air->joysticks);
+    mavlink_msg_joystick_air_get_joystickL(msg, joystick_air->joystickL);
+    mavlink_msg_joystick_air_get_joystickR(msg, joystick_air->joystickR);
     mavlink_msg_joystick_air_get_knobs(msg, joystick_air->knobs);
     mavlink_msg_joystick_air_get_buttons(msg, joystick_air->buttons);
     joystick_air->switchs = mavlink_msg_joystick_air_get_switchs(msg);

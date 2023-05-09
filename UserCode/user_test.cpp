@@ -13,12 +13,48 @@
 #include "HighPrecisionTime/high_precision_time.h"
 #include "Button/buttons.h"
 #include "Led/led_define.hpp"
+#include "Mavlink/wtr_mavlink.h"
 // #include <iomanip>
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
 
 using namespace std;
+
+void MavlinkSenderEntry(void *argument)
+{
+    (void)argument;
+    wtrMavlink_BindChannel(&huart1, MAVLINK_COMM_0);
+    mavlink_joystick_air_t msg = {};
+
+    Joystick::Point_t pos;
+
+    vTaskDelay(2000);
+
+    while (true) {
+        for (size_t i = 0; i < 20; i++) {
+            msg.buttons[i] = Buttons_Read(i + 1);
+        }
+
+        msg.switchs = 0;
+        msg.switchs |= Buttons_Read(Switch_L);
+        msg.switchs |= Buttons_Read(Switch_R) << 1;
+
+        pos              = JoystickL.Pos();
+        msg.joystickL[0] = pos.x;
+        msg.joystickL[1] = pos.y;
+
+        pos              = JoystickR.Pos();
+        msg.joystickR[0] = pos.x;
+        msg.joystickR[1] = pos.y;
+
+        msg.knobs[0] = KnobEncoderL.Count();
+        msg.knobs[1] = KnobEncoderR.Count();
+
+        mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_0, &msg);
+        vTaskDelay(10);
+    }
+}
 
 lv_obj_t *ScreenText;
 
@@ -71,6 +107,8 @@ void TestThreadEntry(void *argument)
     KeyboardLed.Init();
 
     float r = 0, g = 0, b = 0, lightfactor = 1;
+
+    // xTaskCreate(MavlinkSenderEntry, "MavlinkSender", 512, nullptr, 3, nullptr);
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 

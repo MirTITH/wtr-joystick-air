@@ -102,7 +102,7 @@ static inline mavlink_message_t *mavlink_get_channel_buffer(uint8_t chan)
     }
 }
 
-#include "mavlink.h"
+#include "wtr_joystick_air/mavlink.h"
 
 /***************************
  * 以下为针对 wtrMavlink 函数
