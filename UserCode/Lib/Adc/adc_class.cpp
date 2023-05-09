@@ -102,11 +102,9 @@ float Adc::GetTemperature(size_t temperature_sensor_index)
      *          TS_CAL2   = equivalent TS_ADC_DATA at temperature
      *                      TEMP_DEGC_CAL2 (calibrated in factory)
      */
-    static const auto FACTOR          = (TEMPSENSOR_CAL2_TEMP - TEMPSENSOR_CAL1_TEMP) / (*TEMPSENSOR_CAL2_ADDR - *TEMPSENSOR_CAL1_ADDR);
-    static const auto TEMPSENSOR_CAL1 = *TEMPSENSOR_CAL1_ADDR;
-    static const float VOLTAGE_FACTOR = vref_ * 1000.0f / TEMPSENSOR_CAL_VREFANALOG;
+    static const float FACTOR          = (float)(TEMPSENSOR_CAL2_TEMP - TEMPSENSOR_CAL1_TEMP) / (*TEMPSENSOR_CAL2_ADDR - *TEMPSENSOR_CAL1_ADDR);
+    static const float TEMPSENSOR_CAL1 = *TEMPSENSOR_CAL1_ADDR;
+    static const float VOLTAGE_FACTOR  = vref_ * 1000.0f / TEMPSENSOR_CAL_VREFANALOG;
 
-    auto adc_value_16bit = __LL_ADC_CONVERT_DATA_RESOLUTION(GetData(temperature_sensor_index), hadc_->Init.Resolution, LL_ADC_RESOLUTION_16B);
-
-    return (adc_value_16bit * VOLTAGE_FACTOR - TEMPSENSOR_CAL1) * FACTOR + TEMPSENSOR_CAL1_TEMP;
+    return (__LL_ADC_CONVERT_DATA_RESOLUTION(GetData(temperature_sensor_index), hadc_->Init.Resolution, LL_ADC_RESOLUTION_16B) * VOLTAGE_FACTOR - TEMPSENSOR_CAL1) * FACTOR + TEMPSENSOR_CAL1_TEMP;
 }

@@ -57,9 +57,9 @@ void Buttons_Scan()
     flex_button_scan();
 }
 
-uint8_t Buttons_Read(uint8_t Btn)
+uint8_t Buttons_Read(uint8_t keys)
 {
-    switch (Btn) {
+    switch (keys) {
         // 摇杆和旋钮按钮
         case Btn_KnobL:
             return !HAL_GPIO_ReadPin(KnobL_Btn_GPIO_Port, KnobL_Btn_Pin);
@@ -73,14 +73,20 @@ uint8_t Buttons_Read(uint8_t Btn)
         case Btn_JoystickR:
             return !HAL_GPIO_ReadPin(JoystickR_Btn_GPIO_Port, JoystickR_Btn_Pin);
             break;
+        case Switch_L:
+            return !HAL_GPIO_ReadPin(Kb_SwL_GPIO_Port, Kb_SwL_Pin);
+            break;
+        case Switch_R:
+            return !HAL_GPIO_ReadPin(Kb_SwR_GPIO_Port, Kb_SwR_Pin);
+            break;
 
         // 矩阵键盘
         default:
-            if (Btn >= 1 && Btn <= 16) {
-                return (button_matrix_ & (1 << (Btn - 1))) != 0;
+            if (keys >= 1 && keys <= 16) {
+                return (button_matrix_ & (1 << (keys - 1))) != 0;
             }
             break;
     }
 
-    return 0xff;
+    return 0;
 }

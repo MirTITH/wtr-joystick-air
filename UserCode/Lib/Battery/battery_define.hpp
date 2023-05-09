@@ -2,4 +2,4 @@
 
 #include "battery.hpp"
 
-extern Battery battery;
+extern Battery Batt;

@@ -13,6 +13,7 @@
 #include "HighPrecisionTime/high_precision_time.h"
 #include "Button/buttons.h"
 #include "Led/led_define.hpp"
+// #include <iomanip>
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -62,6 +63,7 @@ void TestThreadEntry(void *argument)
 
     stringstream sstr;
     sstr.precision(4);
+    sstr.setf(std::ios::fixed);
 
     KeyboardLed.Init();
 
@@ -73,43 +75,20 @@ void TestThreadEntry(void *argument)
 
         sstr.str("");
 
-        // auto pos = JoystickL.Pos();
+        auto pos = JoystickL.Pos();
 
-        // sstr << pos.x << " " << pos.y << "    ";
+        sstr << "JoystickL: " << pos.x << " " << pos.y << endl;
 
-        // pos = JoystickR.Pos();
-        // sstr << pos.x << " " << pos.y;
+        pos = JoystickR.Pos();
+        sstr << "JoystickR: " << pos.x << " " << pos.y;
 
-        // sstr << endl;
+        sstr << endl;
 
-        // sstr << KnobEncoderL.Count() << " " << KnobEncoderL.ErrorCount() << "    ";
-        // sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
-        // sstr << endl;
-
-        // switch (expression)
-        // {
-        // case /* constant-expression */:
-        //     /* code */
-        //     break;
-
-        // default:
-        //     break;
-        // }
-
-        sstr << "Voltage: " << battery.GetVoltage() << "V; "
-             << "Single battery: " << battery.GetVoltage() / 2 << "V" << endl;
-
-        start_ns = HPT_GetNs();
-        self_ns  = HPT_GetNs();
+        sstr << "KnobL: " << KnobEncoderL.Count() << " " << KnobEncoderL.ErrorCount() << "    ";
+        sstr << "KnobR: " << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
+        sstr << endl;
 
         Buttons_Scan();
-
-        end_ns = HPT_GetNs();
-
-        sum_ns += end_ns - self_ns - (self_ns - start_ns);
-        sum_ns_count++;
-
-        sstr << "time:" << end_ns - self_ns - (self_ns - start_ns) << " avg time:" << sum_ns / sum_ns_count;
 
         if (Buttons_Read(Btn_LeftCrossUp)) {
             g += 0.001;
@@ -138,9 +117,34 @@ void TestThreadEntry(void *argument)
 
         KeyboardLed.SetColor(r, g, b, lightfactor);
 
-        sstr << endl;
         sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor;
-        // sstr << std::hex << (int);
+        sstr << endl;
+
+        // sstr << "SwL SwR: " << (int)Buttons_Read(Switch_L) << (int)Buttons_Read(Switch_R);
+
+        sstr << "Keys: ";
+
+        for (size_t i = 1; i <= 22; i++) {
+            sstr << (int)Buttons_Read(i);
+        }
+
+        sstr << endl;
+
+        sstr << "Voltage: " << Batt.GetVoltage() << "V; "
+             << "Single battery: " << Batt.GetVoltage() / 2 << "V" << endl;
+
+        float temperature;
+        start_ns    = HPT_GetNs();
+        self_ns     = HPT_GetNs();
+        temperature = Adc3.GetTemperature(2);
+        end_ns      = HPT_GetNs();
+
+        sstr << "Temperature: " << temperature << endl;
+
+        sum_ns += end_ns - self_ns - (self_ns - start_ns);
+        sum_ns_count++;
+
+        sstr << "Avg time:" << (float)sum_ns / sum_ns_count;
 
         LvglLock();
         lv_textarea_set_text(ScreenText, sstr.str().c_str());
