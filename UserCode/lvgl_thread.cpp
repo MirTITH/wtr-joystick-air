@@ -1,5 +1,5 @@
 #include "lvgl_thread.h"
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 #include "test_app.hpp"
 // #include "demos/lv_demos.h"
 

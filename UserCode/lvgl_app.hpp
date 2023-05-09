@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 
 enum class LvglAppType {
     Window,

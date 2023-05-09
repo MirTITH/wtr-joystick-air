@@ -1,6 +1,6 @@
 #include "main.h"
-#include "lcd_st7796.hpp"
-#include "lvgl.h"
+#include "Lcd/lcd_st7796.hpp"
+#include "lvgl/lvgl.h"
 #include "adc.h"
 #include "Encoder/encoder_define.hpp"
 

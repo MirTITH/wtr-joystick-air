@@ -2,7 +2,7 @@
 #include "main.h"
 #include "FreeRTOS.h"
 #include "user_test.hpp"
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 #include "lv_port_disp.h"
 #include "lvgl_thread.h"
 

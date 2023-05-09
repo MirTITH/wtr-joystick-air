@@ -10,7 +10,7 @@
  *      INCLUDES
  *********************/
 #include "lv_port_disp.h"
-#include "lcd_st7796.hpp"
+#include "Lcd/lcd_st7796.hpp"
 #include "FreeRTOS.h"
 
 /*********************

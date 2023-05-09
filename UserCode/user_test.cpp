@@ -4,7 +4,7 @@
 #include "driver_mpu9250_basic.h"
 #include "adc.h"
 #include "lvgl_thread.h"
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 #include <sstream>
 #include "Adc/adc_class_define.hpp"
 #include "Battery/battery_define.hpp"
