@@ -14,10 +14,21 @@
 #include "Button/buttons.h"
 #include "Led/led_define.hpp"
 #include "Mavlink/wtr_mavlink.h"
+#include "TouchScreen/GT911/GT911.h"
 // #include <iomanip>
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
+
+GT911_Config_t sampleConfig = {.X_Resolution            = 480,
+                               .Y_Resolution            = 320,
+                               .Number_Of_Touch_Support = 1,
+                               .ReverseX                = true,
+                               .ReverseY                = true,
+                               .SwithX2Y                = true,
+                               .SoftwareNoiseReduction  = true};
+
+TouchCordinate_t cordinate[5];
 
 using namespace std;
 
@@ -108,63 +119,78 @@ void TestThreadEntry(void *argument)
 
     float r = 0, g = 0, b = 0, lightfactor = 1;
 
+    auto init_status = GT911_Init(sampleConfig);
+
+    GT911_Status_t read_status;
+
     // xTaskCreate(MavlinkSenderEntry, "MavlinkSender", 512, nullptr, 3, nullptr);
+
+    uint8_t number = 0;
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
     while (true) {
 
         sstr.str("");
+        read_status = GT911_ReadTouch(cordinate, &number);
 
-        auto pos = JoystickL.Pos();
-        sstr << "JoystickL: " << pos.x << " " << pos.y;
-        pos = JoystickL.RawPos();
-        sstr << " RowValue: " << pos.x << " " << pos.y << endl;
+        sstr << "Init status: " << init_status;
+        sstr << " Read status: " << read_status << endl;
+        sstr << "Touch point num: " << (int)number << endl;
 
-        pos = JoystickR.Pos();
-        sstr << "JoystickR: " << pos.x << " " << pos.y;
-        pos = JoystickR.RawPos();
-        sstr << " RowValue: " << pos.x << " " << pos.y << endl;
-
-        sstr << "KnobL: " << KnobEncoderL.Count() << " ErrCount: " << KnobEncoderL.ErrorCount() << "    ";
-        sstr << "KnobR: " << KnobEncoderR.Count() << " ErrCount: " << KnobEncoderR.ErrorCount() << endl;
-
-        Buttons_Scan();
-
-        if (Buttons_Read(Btn_LeftCrossUp)) {
-            g += 0.001;
-        }
-        if (Buttons_Read(Btn_LeftCrossDown)) {
-            g -= 0.001;
-        }
-        if (Buttons_Read(Btn_LeftCrossLeft)) {
-            b -= 0.001;
-        }
-        if (Buttons_Read(Btn_LeftCrossRight)) {
-            b += 0.001;
-        }
-        if (Buttons_Read(Btn_RightCrossLeft)) {
-            r -= 0.001;
-        }
-        if (Buttons_Read(Btn_RightCrossRight)) {
-            r += 0.001;
-        }
-        if (Buttons_Read(Btn_RightCrossUp)) {
-            lightfactor += 0.01;
-        }
-        if (Buttons_Read(Btn_RightCrossDown)) {
-            lightfactor -= 0.01;
+        for (size_t i = 0; i < 5; i++) {
+            sstr << cordinate[i].x << " " << cordinate[i].y << endl;
         }
 
-        KeyboardLed.SetColor(r, g, b, lightfactor);
+        // auto pos = JoystickL.Pos();
+        // sstr << "JoystickL: " << pos.x << " " << pos.y;
+        // pos = JoystickL.RawPos();
+        // sstr << " RowValue: " << pos.x << " " << pos.y << endl;
 
-        sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor << endl;
+        // pos = JoystickR.Pos();
+        // sstr << "JoystickR: " << pos.x << " " << pos.y;
+        // pos = JoystickR.RawPos();
+        // sstr << " RowValue: " << pos.x << " " << pos.y << endl;
 
-        sstr << "Keys: ";
+        // sstr << "KnobL: " << KnobEncoderL.Count() << " ErrCount: " << KnobEncoderL.ErrorCount() << "    ";
+        // sstr << "KnobR: " << KnobEncoderR.Count() << " ErrCount: " << KnobEncoderR.ErrorCount() << endl;
 
-        for (size_t i = 1; i <= 22; i++) {
-            sstr << (int)Buttons_Read(i);
-        }
+        // Buttons_Scan();
+
+        // if (Buttons_Read(Btn_LeftCrossUp)) {
+        //     g += 0.001;
+        // }
+        // if (Buttons_Read(Btn_LeftCrossDown)) {
+        //     g -= 0.001;
+        // }
+        // if (Buttons_Read(Btn_LeftCrossLeft)) {
+        //     b -= 0.001;
+        // }
+        // if (Buttons_Read(Btn_LeftCrossRight)) {
+        //     b += 0.001;
+        // }
+        // if (Buttons_Read(Btn_RightCrossLeft)) {
+        //     r -= 0.001;
+        // }
+        // if (Buttons_Read(Btn_RightCrossRight)) {
+        //     r += 0.001;
+        // }
+        // if (Buttons_Read(Btn_RightCrossUp)) {
+        //     lightfactor += 0.01;
+        // }
+        // if (Buttons_Read(Btn_RightCrossDown)) {
+        //     lightfactor -= 0.01;
+        // }
+
+        // KeyboardLed.SetColor(r, g, b, lightfactor);
+
+        // sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor << endl;
+
+        // sstr << "Keys: ";
+
+        // for (size_t i = 1; i <= 22; i++) {
+        //     sstr << (int)Buttons_Read(i);
+        // }
 
         sstr << endl;
 
