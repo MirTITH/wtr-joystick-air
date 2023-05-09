@@ -28,20 +28,23 @@ void TestThreadEntry(void *argument)
 
     Adc3.Init();
     Adc3.StartDma();
-    JoystickL.x_max    = 0.96;
-    JoystickL.x_middle = 0.4435;
-    JoystickL.x_min    = 0;
-    JoystickL.y_max    = 0.9987;
+
+    JoystickL.x_max    = 0.9;
+    JoystickL.x_middle = 0.4475;
+    JoystickL.x_min    = 0.05;
+
+    JoystickL.y_max    = 0.95;
     JoystickL.y_middle = 0.505;
-    JoystickL.y_min    = 0;
+    JoystickL.y_min    = 0.05;
     JoystickL.Init();
 
-    JoystickR.x_max    = 1;
+    JoystickR.x_max    = 0.95;
     JoystickR.x_middle = 0.526;
-    JoystickR.x_min    = 0;
-    JoystickR.y_max    = 0.9995;
+    JoystickR.x_min    = 0.05;
+
+    JoystickR.y_max    = 0.95;
     JoystickR.y_middle = 0.51;
-    JoystickR.y_min    = 0;
+    JoystickR.y_min    = 0.05;
     JoystickR.Init();
 
     KnobEncoderL.Init();
@@ -52,10 +55,10 @@ void TestThreadEntry(void *argument)
     ScreenText = lv_textarea_create(lv_scr_act());
     lv_obj_set_size(ScreenText, lv_pct(100), lv_pct(100));
 
-    uint64_t start_ns, end_ns, self_ns;
+    // uint64_t start_ns, end_ns, self_ns;
 
-    uint32_t sum_ns       = 0;
-    uint32_t sum_ns_count = 0;
+    // uint32_t sum_ns       = 0;
+    // uint32_t sum_ns_count = 0;
 
     LvglUnlock();
 
@@ -76,17 +79,17 @@ void TestThreadEntry(void *argument)
         sstr.str("");
 
         auto pos = JoystickL.Pos();
-
-        sstr << "JoystickL: " << pos.x << " " << pos.y << endl;
+        sstr << "JoystickL: " << pos.x << " " << pos.y;
+        pos = JoystickL.RawPos();
+        sstr << " RowValue: " << pos.x << " " << pos.y << endl;
 
         pos = JoystickR.Pos();
         sstr << "JoystickR: " << pos.x << " " << pos.y;
+        pos = JoystickR.RawPos();
+        sstr << " RowValue: " << pos.x << " " << pos.y << endl;
 
-        sstr << endl;
-
-        sstr << "KnobL: " << KnobEncoderL.Count() << " " << KnobEncoderL.ErrorCount() << "    ";
-        sstr << "KnobR: " << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
-        sstr << endl;
+        sstr << "KnobL: " << KnobEncoderL.Count() << " ErrCount: " << KnobEncoderL.ErrorCount() << "    ";
+        sstr << "KnobR: " << KnobEncoderR.Count() << " ErrCount: " << KnobEncoderR.ErrorCount() << endl;
 
         Buttons_Scan();
 
@@ -117,10 +120,7 @@ void TestThreadEntry(void *argument)
 
         KeyboardLed.SetColor(r, g, b, lightfactor);
 
-        sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor;
-        sstr << endl;
-
-        // sstr << "SwL SwR: " << (int)Buttons_Read(Switch_L) << (int)Buttons_Read(Switch_R);
+        sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor << endl;
 
         sstr << "Keys: ";
 
@@ -133,18 +133,15 @@ void TestThreadEntry(void *argument)
         sstr << "Voltage: " << Batt.GetVoltage() << "V; "
              << "Single battery: " << Batt.GetVoltage() / 2 << "V" << endl;
 
-        float temperature;
-        start_ns    = HPT_GetNs();
-        self_ns     = HPT_GetNs();
-        temperature = Adc3.GetTemperature(2);
-        end_ns      = HPT_GetNs();
+        // start_ns    = HPT_GetNs();
+        // self_ns     = HPT_GetNs();
 
-        sstr << "Temperature: " << temperature << endl;
+        // end_ns      = HPT_GetNs();
+        // sum_ns += end_ns - self_ns - (self_ns - start_ns);
+        // sum_ns_count++;
+        // sstr << "Avg time:" << (float)sum_ns / sum_ns_count << endl;
 
-        sum_ns += end_ns - self_ns - (self_ns - start_ns);
-        sum_ns_count++;
-
-        sstr << "Avg time:" << (float)sum_ns / sum_ns_count;
+        sstr << "Temperature: " << GetCoreTemperature() << endl;
 
         LvglLock();
         lv_textarea_set_text(ScreenText, sstr.str().c_str());
