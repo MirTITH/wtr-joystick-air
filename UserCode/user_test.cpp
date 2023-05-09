@@ -11,8 +11,7 @@
 #include "Joystick/joystick_define.hpp"
 #include "Encoder/encoder_define.hpp"
 #include "HighPrecisionTime/high_precision_time.h"
-#include "Button/joystick_button.hpp"
-#include "Button/matrix_keyboard.hpp"
+#include "Button/buttons.h"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -51,22 +50,22 @@ void TestThreadEntry(void *argument)
     ScreenText = lv_textarea_create(lv_scr_act());
     lv_obj_set_size(ScreenText, lv_pct(100), lv_pct(100));
 
-    // uint64_t start_ns, end_ns, self_ns;
+    uint64_t start_ns, end_ns, self_ns;
 
-    // uint32_t sum_ns       = 0;
-    // uint32_t sum_ns_count = 0;
+    uint32_t sum_ns       = 0;
+    uint32_t sum_ns_count = 0;
 
     LvglUnlock();
 
-    JoystickButtonInit();
+    Buttons_Init();
 
     stringstream sstr;
+
+    sstr.precision(4);
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
     while (true) {
-        // start_ns = HPT_GetNs();
-        // self_ns  = HPT_GetNs();
 
         sstr.str("");
 
@@ -83,24 +82,26 @@ void TestThreadEntry(void *argument)
         // sstr << KnobEncoderR.Count() << " " << KnobEncoderR.ErrorCount();
         // sstr << endl;
 
-        // sstr << battery.GetVoltage() << endl;
+        sstr << "Voltage: " << battery.GetVoltage() << "V; "
+             << "Single battery: " << battery.GetVoltage() / 2 << "V" << endl;
 
-        // end_ns = HPT_GetNs();
+        start_ns = HPT_GetNs();
+        self_ns  = HPT_GetNs();
 
-        // sum_ns += end_ns - self_ns - (self_ns - start_ns);
-        // sum_ns_count++;
+        Buttons_Scan();
 
-        // sstr << "self:" << self_ns - start_ns << " time:" << sum_ns / sum_ns_count;
-        auto result = MatrixKeyboard_Scan();
+        end_ns = HPT_GetNs();
+
+        sum_ns += end_ns - self_ns - (self_ns - start_ns);
+        sum_ns_count++;
+
+        sstr << "time:" << end_ns - self_ns - (self_ns - start_ns) << " avg time:" << sum_ns / sum_ns_count;
         // sstr << std::hex << (int);
-        for (size_t i = 0; i < 16; i++) {
-            sstr << ((result & (1 << i)) != 0);
-        }
 
         LvglLock();
         lv_textarea_set_text(ScreenText, sstr.str().c_str());
         LvglUnlock();
-        // flex_button_scan();
+
         vTaskDelayUntil(&PreviousWakeTime, 20);
     }
 }

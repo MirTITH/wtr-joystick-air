@@ -9,7 +9,7 @@
  *
  */
 
-#include "matrix_keyboard.hpp"
+#include "matrix_keyboard.h"
 #include "HighPrecisionTime/high_precision_time.h"
 #include "main.h"
 

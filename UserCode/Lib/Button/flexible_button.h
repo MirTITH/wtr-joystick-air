@@ -37,7 +37,7 @@
 #define FLEX_MS_TO_SCAN_CNT(ms) (ms / (1000 / FLEX_BTN_SCAN_FREQ_HZ))
 
 /* Multiple clicks interval, default 300ms */
-#define MAX_MULTIPLE_CLICKS_INTERVAL (FLEX_MS_TO_SCAN_CNT(300))
+#define MAX_MULTIPLE_CLICKS_INTERVAL (FLEX_MS_TO_SCAN_CNT(400))
 
 typedef void (*flex_button_response_callback)(void*);
 
