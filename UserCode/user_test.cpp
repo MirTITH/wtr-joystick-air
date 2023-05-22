@@ -15,17 +15,17 @@
 #include "Led/led_define.hpp"
 #include "Mavlink/wtr_mavlink.h"
 #include "TouchScreen/GT911/GT911.h"
-// #include <iomanip>
+#include <iomanip>
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
 
-GT911_Config_t sampleConfig = {.X_Resolution            = 480,
-                               .Y_Resolution            = 320,
-                               .Number_Of_Touch_Support = 1,
-                               .ReverseX                = true,
-                               .ReverseY                = true,
-                               .SwithX2Y                = true,
+GT911_Config_t sampleConfig = {.X_Resolution            = 320,
+                               .Y_Resolution            = 480,
+                               .Number_Of_Touch_Support = 5,
+                               .ReverseX                = false,
+                               .ReverseY                = false,
+                               .SwithX2Y                = false,
                                .SoftwareNoiseReduction  = true};
 
 TouchCordinate_t cordinate[5];
@@ -129,17 +129,36 @@ void TestThreadEntry(void *argument)
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
+    uint32_t gt911_id   = 0;
+    uint8_t RegBuf[131] = {};
+    int32_t read_num    = 131;
+    GT911_ReadReg(0x8047, RegBuf, read_num);
+
     while (true) {
 
         sstr.str("");
+        sstr << dec;
         read_status = GT911_ReadTouch(cordinate, &number);
 
-        sstr << "Init status: " << init_status;
-        sstr << " Read status: " << read_status << endl;
+        // sstr << "Init status: " << init_status << endl;
+        // sstr << "ID: " << gt911_id << endl;
+        // sstr << " Read status: " << read_status << endl;
         sstr << "Touch point num: " << (int)number << endl;
 
         for (size_t i = 0; i < 5; i++) {
-            sstr << cordinate[i].x << " " << cordinate[i].y << endl;
+            sstr << cordinate[i].x << " " << cordinate[i].y << '\t';
+        }
+
+        sstr << endl;
+        sstr << hex;
+
+        for (int32_t i = 0; i < read_num; i++) {
+            sstr << 0x47 + i << ":" << setw(2) << setfill('0') << (int)RegBuf[i];
+            if (i % 9 == 8) {
+                sstr << endl;
+            } else {
+                sstr << ' ';
+            }
         }
 
         // auto pos = JoystickL.Pos();
@@ -194,8 +213,8 @@ void TestThreadEntry(void *argument)
 
         sstr << endl;
 
-        sstr << "Voltage: " << Batt.GetVoltage() << "V; "
-             << "Single battery: " << Batt.GetVoltage() / 2 << "V" << endl;
+        // sstr << "Voltage: " << Batt.GetVoltage() << "V; "
+        //      << "Single battery: " << Batt.GetVoltage() / 2 << "V" << endl;
 
         // start_ns    = HPT_GetNs();
         // self_ns     = HPT_GetNs();
@@ -205,7 +224,7 @@ void TestThreadEntry(void *argument)
         // sum_ns_count++;
         // sstr << "Avg time:" << (float)sum_ns / sum_ns_count << endl;
 
-        sstr << "Temperature: " << GetCoreTemperature() << endl;
+        // sstr << "Temperature: " << GetCoreTemperature() << endl;
 
         LvglLock();
         lv_textarea_set_text(ScreenText, sstr.str().c_str());

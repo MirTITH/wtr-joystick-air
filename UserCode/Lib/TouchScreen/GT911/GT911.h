@@ -104,6 +104,7 @@ extern "C" {
 
 /* Exported functions ------------------------------------------------------- */
 GT911_Status_t GT911_Init(GT911_Config_t config);
+void GT911_ReadReg(uint16_t _usRegAddr, uint8_t *_pRegBuf, uint8_t _ucLen);
 GT911_Status_t GT911_ReadTouch(TouchCordinate_t *cordinate, uint8_t *number_of_cordinate);
 
 // User method implementation prototype ----------------------------------------*/
@@ -115,7 +116,7 @@ void GT911_Delay(uint16_t ms);
 GT911_Status_t GT911_I2C_Init(void);
 GT911_Status_t GT911_I2C_Write(uint8_t Addr, uint8_t *write_data, uint16_t write_length);
 GT911_Status_t GT911_I2C_Read(uint8_t Addr, uint8_t *read_data, uint16_t read_length);
-
+GT911_Status_t GT911_GetProductID(uint32_t* id);
 #ifdef __cplusplus
 }
 #endif

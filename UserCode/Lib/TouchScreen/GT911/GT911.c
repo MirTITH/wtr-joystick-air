@@ -2,10 +2,15 @@
 #include <string.h>
 #include "GT911.h"
 #include "main.h"
+#include "i2c.h"
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
 
+#define		GT911_DIV_ID	0XBA	//设备地址 //0X28 //0XBA
+
+#define 	GT911_DIV_W		(GT911_DIV_ID | 0)	//写地址
+#define 	GT911_DIV_R		(GT911_DIV_ID | 1)	//读地址
 /* Private macro -------------------------------------------------------------*/
 
 
@@ -33,7 +38,7 @@ static uint8_t RxBuffer[200];
 static void GT911_Reset(void);
 static void GT911_CalculateCheckSum(void);
 static GT911_Status_t GT911_SetCommandRegister(uint8_t command);
-static GT911_Status_t GT911_GetProductID(uint32_t* id);
+GT911_Status_t GT911_GetProductID(uint32_t* id);
 static GT911_Status_t GT911_SendConfig(void);
 static GT911_Status_t GT911_GetStatus(uint8_t* status);
 static GT911_Status_t GT911_SetStatus(uint8_t status);
@@ -70,12 +75,22 @@ GT911_Status_t GT911_Init(GT911_Config_t config){
 	}
 	//Reset chip
 	GT911_Reset();
-	CommunicationResult = GT911_SendConfig();
-	if(CommunicationResult != GT911_OK){
-		return CommunicationResult;
-	}
-	GT911_SetCommandRegister(0x00);
+	// CommunicationResult = GT911_SendConfig();
+	// if(CommunicationResult != GT911_OK){
+	// 	return CommunicationResult;
+	// }
+	// GT911_SetCommandRegister(0x00);
 	return GT911_OK;
+}
+
+void GT911_WriteReg(uint16_t _usRegAddr, uint8_t *_pRegBuf, uint8_t _ucLen)
+{
+	HAL_I2C_Mem_Write(&hi2c1, GT911_DIV_W, _usRegAddr, I2C_MEMADD_SIZE_16BIT, _pRegBuf, _ucLen, 0xff);
+}
+
+void GT911_ReadReg(uint16_t _usRegAddr, uint8_t *_pRegBuf, uint8_t _ucLen)
+{
+	HAL_I2C_Mem_Read(&hi2c1, GT911_DIV_R, _usRegAddr, I2C_MEMADD_SIZE_16BIT, _pRegBuf, _ucLen, 0xff);
 }
 
 GT911_Status_t GT911_ReadTouch(TouchCordinate_t *cordinate, uint8_t *number_of_cordinate) {
@@ -132,7 +147,7 @@ static GT911_Status_t GT911_SetCommandRegister(uint8_t command){
 	return GT911_I2C_Write(GOODIX_ADDRESS, TxBuffer, 3);
 }
 
-static GT911_Status_t GT911_GetProductID(uint32_t* id){
+GT911_Status_t GT911_GetProductID(uint32_t* id){
 	TxBuffer[0] = (GOODIX_REG_ID & 0xFF00) >> 8;
 	TxBuffer[1] = GOODIX_REG_ID & 0xFF;
 	GT911_Status_t Result = GT911_NotResponse;
