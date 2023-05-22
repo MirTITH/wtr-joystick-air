@@ -130,12 +130,13 @@ void TestThreadEntry(void *argument)
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
     uint32_t gt911_id   = 0;
-    uint8_t RegBuf[131] = {};
-    int32_t read_num    = 131;
+    uint8_t RegBuf[209] = {};
+    int32_t read_num    = 209;
+
+    // vTaskDelay(1000);
+
     GT911_ReadReg(0x8047, RegBuf, read_num);
-
     while (true) {
-
         sstr.str("");
         sstr << dec;
         read_status = GT911_ReadTouch(cordinate, &number);
@@ -149,16 +150,17 @@ void TestThreadEntry(void *argument)
             sstr << cordinate[i].x << " " << cordinate[i].y << '\t';
         }
 
-        sstr << endl;
+        // sstr << endl;
         sstr << hex;
 
         for (int32_t i = 0; i < read_num; i++) {
-            sstr << 0x47 + i << ":" << setw(2) << setfill('0') << (int)RegBuf[i];
-            if (i % 9 == 8) {
-                sstr << endl;
+            if (i % 16 == 0) {
+                sstr << endl
+                     << 0x8047 + i << ":";
             } else {
                 sstr << ' ';
             }
+            sstr << setw(2) << setfill('0') << (int)RegBuf[i];
         }
 
         // auto pos = JoystickL.Pos();
@@ -211,7 +213,7 @@ void TestThreadEntry(void *argument)
         //     sstr << (int)Buttons_Read(i);
         // }
 
-        sstr << endl;
+        // sstr << endl;
 
         // sstr << "Voltage: " << Batt.GetVoltage() << "V; "
         //      << "Single battery: " << Batt.GetVoltage() / 2 << "V" << endl;
