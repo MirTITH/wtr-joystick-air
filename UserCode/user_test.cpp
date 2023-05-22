@@ -168,6 +168,10 @@ void TestThreadEntry(void *argument)
 
         sstr << endl;
 
+        sstr << "Adc3 DMA: " << __HAL_DMA_GET_COUNTER(hadc3.DMA_Handle)
+             << " " << ((DMA_Stream_TypeDef *)hadc3.DMA_Handle->Instance)->NDTR
+             << endl;
+
         sstr << "Voltage: " << Batt.GetVoltage() << "V; "
              << "Single battery: " << Batt.GetVoltage() / 2 << "V" << endl;
 
