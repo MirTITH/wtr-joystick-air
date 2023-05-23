@@ -14,21 +14,13 @@
 #include "Button/buttons.h"
 #include "Led/led_define.hpp"
 #include "Mavlink/wtr_mavlink.h"
-#include "TouchScreen/GT911/GT911.h"
+#include "TouchScreen/GT911/gt911_define.hpp"
 #include <iomanip>
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
 
-GT911_Config_t sampleConfig = {.X_Resolution            = 320,
-                               .Y_Resolution            = 480,
-                               .Number_Of_Touch_Support = 5,
-                               .ReverseX                = false,
-                               .ReverseY                = false,
-                               .SwithX2Y                = false,
-                               .SoftwareNoiseReduction  = true};
-
-TouchCordinate_t cordinate[5];
+uint16_t cordinate[5];
 
 using namespace std;
 
@@ -117,51 +109,54 @@ void TestThreadEntry(void *argument)
 
     KeyboardLed.Init();
 
-    float r = 0, g = 0, b = 0, lightfactor = 1;
+    // float r = 0, g = 0, b = 0, lightfactor = 1;
 
-    auto init_status = GT911_Init(sampleConfig);
-
-    GT911_Status_t read_status;
+    auto init_status = TouchScreen.Init();
 
     // xTaskCreate(MavlinkSenderEntry, "MavlinkSender", 512, nullptr, 3, nullptr);
 
-    uint8_t number = 0;
-
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
-    uint32_t gt911_id   = 0;
-    uint8_t RegBuf[209] = {};
-    int32_t read_num    = 209;
-
-    // vTaskDelay(1000);
-
-    GT911_ReadReg(0x8047, RegBuf, read_num);
     while (true) {
         sstr.str("");
-        sstr << dec;
-        read_status = GT911_ReadTouch(cordinate, &number);
+
+        sstr << "init_status: " << init_status << endl;
+
+        sstr << (int)TouchScreen.ConfigVersion() << endl;
+        sstr << TouchScreen.MaxOutput_X() << endl;
+        sstr << TouchScreen.MaxOutput_Y() << endl;
+        sstr << TouchScreen.MaxTouchNum() << endl;
+
+        TouchScreen.UpdateTouch();
+
+        for (auto point : TouchScreen.touch_points) {
+            sstr << (int)point.track_id << ' ' << point.size << ' ' << point.x << ' ' << point.y << endl;
+        }
+        sstr << "End";
+
+        // sstr << dec;
 
         // sstr << "Init status: " << init_status << endl;
         // sstr << "ID: " << gt911_id << endl;
         // sstr << " Read status: " << read_status << endl;
-        sstr << "Touch point num: " << (int)number << endl;
+        // sstr << "Touch point num: " << (int)number << endl;
 
-        for (size_t i = 0; i < 5; i++) {
-            sstr << cordinate[i].x << " " << cordinate[i].y << '\t';
-        }
+        // for (size_t i = 0; i < 5; i++) {
+        //     sstr << cordinate[i].x << " " << cordinate[i].y << '\t';
+        // }
 
         // sstr << endl;
-        sstr << hex;
+        // sstr << hex;
 
-        for (int32_t i = 0; i < read_num; i++) {
-            if (i % 16 == 0) {
-                sstr << endl
-                     << 0x8047 + i << ":";
-            } else {
-                sstr << ' ';
-            }
-            sstr << setw(2) << setfill('0') << (int)RegBuf[i];
-        }
+        // for (int32_t i = 0; i < read_num; i++) {
+        //     if (i % 16 == 0) {
+        //         sstr << endl
+        //              << 0x8047 + i << ":";
+        //     } else {
+        //         sstr << ' ';
+        //     }
+        //     sstr << setw(2) << setfill('0') << (int)RegBuf[i];
+        // }
 
         // auto pos = JoystickL.Pos();
         // sstr << "JoystickL: " << pos.x << " " << pos.y;
