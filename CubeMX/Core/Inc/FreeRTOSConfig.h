@@ -73,6 +73,7 @@
 #define configUSE_COUNTING_SEMAPHORES            1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION  1
 #define configUSE_TICKLESS_IDLE                  2
+#define configRECORD_STACK_HIGH_ADDRESS          1
 #define configUSE_POSIX_ERRNO                    1
 /* USER CODE BEGIN MESSAGE_BUFFER_LENGTH_TYPE */
 /* Defaults to size_t for backward compatibility, but can be changed

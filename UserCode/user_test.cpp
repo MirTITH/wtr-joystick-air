@@ -20,8 +20,6 @@
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
 
-uint16_t cordinate[5];
-
 using namespace std;
 
 void MavlinkSenderEntry(void *argument)
