@@ -14,7 +14,8 @@
 #include "Button/buttons.h"
 #include "Led/led_define.hpp"
 #include "Mavlink/wtr_mavlink.h"
-// #include <iomanip>
+#include "TouchScreen/GT911/gt911_define.hpp"
+#include <iomanip>
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -106,67 +107,106 @@ void TestThreadEntry(void *argument)
 
     KeyboardLed.Init();
 
-    float r = 0, g = 0, b = 0, lightfactor = 1;
+    // float r = 0, g = 0, b = 0, lightfactor = 1;
+
+    // auto init_status = TouchScreen.Init();
 
     // xTaskCreate(MavlinkSenderEntry, "MavlinkSender", 512, nullptr, 3, nullptr);
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
     while (true) {
-
         sstr.str("");
 
-        auto pos = JoystickL.Pos();
-        sstr << "JoystickL: " << pos.x << " " << pos.y;
-        pos = JoystickL.RawPos();
-        sstr << " RowValue: " << pos.x << " " << pos.y << endl;
+        // sstr << "init_status: " << init_status << endl;
 
-        pos = JoystickR.Pos();
-        sstr << "JoystickR: " << pos.x << " " << pos.y;
-        pos = JoystickR.RawPos();
-        sstr << " RowValue: " << pos.x << " " << pos.y << endl;
+        sstr << (int)TouchScreen.ConfigVersion() << endl;
+        sstr << TouchScreen.MaxOutput_X() << endl;
+        sstr << TouchScreen.MaxOutput_Y() << endl;
+        sstr << (int)TouchScreen.MaxTouchNum() << endl;
 
-        sstr << "KnobL: " << KnobEncoderL.Count() << " ErrCount: " << KnobEncoderL.ErrorCount() << "    ";
-        sstr << "KnobR: " << KnobEncoderR.Count() << " ErrCount: " << KnobEncoderR.ErrorCount() << endl;
+        // TouchScreen.UpdateTouch();
 
-        Buttons_Scan();
+        for (auto point : TouchScreen.touch_points) {
+            sstr << (int)point.track_id << ' ' << point.size << ' ' << point.x << ' ' << point.y << endl;
+        }
+        sstr << "End";
 
-        if (Buttons_Read(Btn_LeftCrossUp)) {
-            g += 0.001;
-        }
-        if (Buttons_Read(Btn_LeftCrossDown)) {
-            g -= 0.001;
-        }
-        if (Buttons_Read(Btn_LeftCrossLeft)) {
-            b -= 0.001;
-        }
-        if (Buttons_Read(Btn_LeftCrossRight)) {
-            b += 0.001;
-        }
-        if (Buttons_Read(Btn_RightCrossLeft)) {
-            r -= 0.001;
-        }
-        if (Buttons_Read(Btn_RightCrossRight)) {
-            r += 0.001;
-        }
-        if (Buttons_Read(Btn_RightCrossUp)) {
-            lightfactor += 0.01;
-        }
-        if (Buttons_Read(Btn_RightCrossDown)) {
-            lightfactor -= 0.01;
-        }
+        // sstr << dec;
 
-        KeyboardLed.SetColor(r, g, b, lightfactor);
+        // sstr << "Init status: " << init_status << endl;
+        // sstr << "ID: " << gt911_id << endl;
+        // sstr << " Read status: " << read_status << endl;
+        // sstr << "Touch point num: " << (int)number << endl;
 
-        sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor << endl;
+        // for (size_t i = 0; i < 5; i++) {
+        //     sstr << cordinate[i].x << " " << cordinate[i].y << '\t';
+        // }
 
-        sstr << "Keys: ";
+        // sstr << endl;
+        // sstr << hex;
 
-        for (size_t i = 1; i <= 22; i++) {
-            sstr << (int)Buttons_Read(i);
-        }
+        // for (int32_t i = 0; i < read_num; i++) {
+        //     if (i % 16 == 0) {
+        //         sstr << endl
+        //              << 0x8047 + i << ":";
+        //     } else {
+        //         sstr << ' ';
+        //     }
+        //     sstr << setw(2) << setfill('0') << (int)RegBuf[i];
+        // }
 
-        sstr << endl;
+        // auto pos = JoystickL.Pos();
+        // sstr << "JoystickL: " << pos.x << " " << pos.y;
+        // pos = JoystickL.RawPos();
+        // sstr << " RowValue: " << pos.x << " " << pos.y << endl;
+
+        // pos = JoystickR.Pos();
+        // sstr << "JoystickR: " << pos.x << " " << pos.y;
+        // pos = JoystickR.RawPos();
+        // sstr << " RowValue: " << pos.x << " " << pos.y << endl;
+
+        // sstr << "KnobL: " << KnobEncoderL.Count() << " ErrCount: " << KnobEncoderL.ErrorCount() << "    ";
+        // sstr << "KnobR: " << KnobEncoderR.Count() << " ErrCount: " << KnobEncoderR.ErrorCount() << endl;
+
+        // Buttons_Scan();
+
+        // if (Buttons_Read(Btn_LeftCrossUp)) {
+        //     g += 0.001;
+        // }
+        // if (Buttons_Read(Btn_LeftCrossDown)) {
+        //     g -= 0.001;
+        // }
+        // if (Buttons_Read(Btn_LeftCrossLeft)) {
+        //     b -= 0.001;
+        // }
+        // if (Buttons_Read(Btn_LeftCrossRight)) {
+        //     b += 0.001;
+        // }
+        // if (Buttons_Read(Btn_RightCrossLeft)) {
+        //     r -= 0.001;
+        // }
+        // if (Buttons_Read(Btn_RightCrossRight)) {
+        //     r += 0.001;
+        // }
+        // if (Buttons_Read(Btn_RightCrossUp)) {
+        //     lightfactor += 0.01;
+        // }
+        // if (Buttons_Read(Btn_RightCrossDown)) {
+        //     lightfactor -= 0.01;
+        // }
+
+        // KeyboardLed.SetColor(r, g, b, lightfactor);
+
+        // sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor << endl;
+
+        // sstr << "Keys: ";
+
+        // for (size_t i = 1; i <= 22; i++) {
+        //     sstr << (int)Buttons_Read(i);
+        // }
+
+        // sstr << endl;
 
         sstr << "Adc3 DMA: " << __HAL_DMA_GET_COUNTER(hadc3.DMA_Handle)
              << " " << ((DMA_Stream_TypeDef *)hadc3.DMA_Handle->Instance)->NDTR
@@ -183,7 +223,7 @@ void TestThreadEntry(void *argument)
         // sum_ns_count++;
         // sstr << "Avg time:" << (float)sum_ns / sum_ns_count << endl;
 
-        sstr << "Temperature: " << GetCoreTemperature() << endl;
+        // sstr << "Temperature: " << GetCoreTemperature() << endl;
 
         LvglLock();
         lv_textarea_set_text(ScreenText, sstr.str().c_str());
