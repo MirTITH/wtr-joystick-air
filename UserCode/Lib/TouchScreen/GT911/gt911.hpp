@@ -185,10 +185,8 @@ public:
 
     bool Init()
     {
-        // Reset chip
         Reset();
 
-        // Get product ID
         if (ReadProductId() != true) {
             return false;
         }
