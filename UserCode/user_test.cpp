@@ -107,9 +107,7 @@ void TestThreadEntry(void *argument)
 
     KeyboardLed.Init();
 
-    // float r = 0, g = 0, b = 0, lightfactor = 1;
-
-    // auto init_status = TouchScreen.Init();
+    float r = 0, g = 0, b = 0, lightfactor = 1;
 
     // xTaskCreate(MavlinkSenderEntry, "MavlinkSender", 512, nullptr, 3, nullptr);
 
@@ -118,99 +116,70 @@ void TestThreadEntry(void *argument)
     while (true) {
         sstr.str("");
 
-        // sstr << "init_status: " << init_status << endl;
-
-        sstr << (int)TouchScreen.ConfigVersion() << endl;
-        sstr << TouchScreen.MaxOutput_X() << endl;
-        sstr << TouchScreen.MaxOutput_Y() << endl;
-        sstr << (int)TouchScreen.MaxTouchNum() << endl;
-
-        // TouchScreen.UpdateTouch();
+        sstr << "Touch screen: Config version: " << (int)TouchScreen.ConfigVersion();
+        sstr << " MaxOutput_X: " << TouchScreen.MaxOutput_X();
+        sstr << " MaxOutput_Y: " << TouchScreen.MaxOutput_Y();
+        sstr << " MaxTouchNum: " << (int)TouchScreen.MaxTouchNum() << endl;
 
         for (auto point : TouchScreen.touch_points) {
             sstr << (int)point.track_id << ' ' << point.size << ' ' << point.x << ' ' << point.y << endl;
         }
-        sstr << "End";
 
-        // sstr << dec;
+        auto pos = JoystickL.Pos();
+        sstr << "JL: " << pos.x << " " << pos.y;
+        pos = JoystickL.RawPos();
+        sstr << " RowValue: " << pos.x << " " << pos.y << endl;
 
-        // sstr << "Init status: " << init_status << endl;
-        // sstr << "ID: " << gt911_id << endl;
-        // sstr << " Read status: " << read_status << endl;
-        // sstr << "Touch point num: " << (int)number << endl;
+        pos = JoystickR.Pos();
+        sstr << "JR: " << pos.x << " " << pos.y;
+        pos = JoystickR.RawPos();
+        sstr << " RowValue: " << pos.x << " " << pos.y << endl;
 
-        // for (size_t i = 0; i < 5; i++) {
-        //     sstr << cordinate[i].x << " " << cordinate[i].y << '\t';
-        // }
+        sstr << "KnobL: " << KnobEncoderL.Count() << " ErrCount: " << KnobEncoderL.ErrorCount() << "    ";
+        sstr << "KnobR: " << KnobEncoderR.Count() << " ErrCount: " << KnobEncoderR.ErrorCount() << endl;
 
-        // sstr << endl;
-        // sstr << hex;
+        Buttons_Scan();
 
-        // for (int32_t i = 0; i < read_num; i++) {
-        //     if (i % 16 == 0) {
-        //         sstr << endl
-        //              << 0x8047 + i << ":";
-        //     } else {
-        //         sstr << ' ';
-        //     }
-        //     sstr << setw(2) << setfill('0') << (int)RegBuf[i];
-        // }
+        if (Buttons_Read(Btn_LeftCrossUp)) {
+            g += 0.001;
+        }
+        if (Buttons_Read(Btn_LeftCrossDown)) {
+            g -= 0.001;
+        }
+        if (Buttons_Read(Btn_LeftCrossLeft)) {
+            b -= 0.001;
+        }
+        if (Buttons_Read(Btn_LeftCrossRight)) {
+            b += 0.001;
+        }
+        if (Buttons_Read(Btn_RightCrossLeft)) {
+            r -= 0.001;
+        }
+        if (Buttons_Read(Btn_RightCrossRight)) {
+            r += 0.001;
+        }
+        if (Buttons_Read(Btn_RightCrossUp)) {
+            lightfactor += 0.01;
+        }
+        if (Buttons_Read(Btn_RightCrossDown)) {
+            lightfactor -= 0.01;
+        }
 
-        // auto pos = JoystickL.Pos();
-        // sstr << "JoystickL: " << pos.x << " " << pos.y;
-        // pos = JoystickL.RawPos();
-        // sstr << " RowValue: " << pos.x << " " << pos.y << endl;
+        KeyboardLed.SetColor(r, g, b, lightfactor);
 
-        // pos = JoystickR.Pos();
-        // sstr << "JoystickR: " << pos.x << " " << pos.y;
-        // pos = JoystickR.RawPos();
-        // sstr << " RowValue: " << pos.x << " " << pos.y << endl;
+        sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor << endl;
 
-        // sstr << "KnobL: " << KnobEncoderL.Count() << " ErrCount: " << KnobEncoderL.ErrorCount() << "    ";
-        // sstr << "KnobR: " << KnobEncoderR.Count() << " ErrCount: " << KnobEncoderR.ErrorCount() << endl;
+        sstr << "Keys: ";
 
-        // Buttons_Scan();
+        for (size_t i = 1; i <= 22; i++) {
+            sstr << (int)Buttons_Read(i);
+        }
 
-        // if (Buttons_Read(Btn_LeftCrossUp)) {
-        //     g += 0.001;
-        // }
-        // if (Buttons_Read(Btn_LeftCrossDown)) {
-        //     g -= 0.001;
-        // }
-        // if (Buttons_Read(Btn_LeftCrossLeft)) {
-        //     b -= 0.001;
-        // }
-        // if (Buttons_Read(Btn_LeftCrossRight)) {
-        //     b += 0.001;
-        // }
-        // if (Buttons_Read(Btn_RightCrossLeft)) {
-        //     r -= 0.001;
-        // }
-        // if (Buttons_Read(Btn_RightCrossRight)) {
-        //     r += 0.001;
-        // }
-        // if (Buttons_Read(Btn_RightCrossUp)) {
-        //     lightfactor += 0.01;
-        // }
-        // if (Buttons_Read(Btn_RightCrossDown)) {
-        //     lightfactor -= 0.01;
-        // }
+        sstr << endl;
 
-        // KeyboardLed.SetColor(r, g, b, lightfactor);
-
-        // sstr << "r g b l:" << r << " " << g << " " << b << " " << lightfactor << endl;
-
-        // sstr << "Keys: ";
-
-        // for (size_t i = 1; i <= 22; i++) {
-        //     sstr << (int)Buttons_Read(i);
-        // }
-
-        // sstr << endl;
-
-        sstr << "Adc3 DMA: " << __HAL_DMA_GET_COUNTER(hadc3.DMA_Handle)
-             << " " << ((DMA_Stream_TypeDef *)hadc3.DMA_Handle->Instance)->NDTR
-             << endl;
+        // sstr << "Adc3 DMA: " << __HAL_DMA_GET_COUNTER(hadc3.DMA_Handle)
+        //      << " " << ((DMA_Stream_TypeDef *)hadc3.DMA_Handle->Instance)->NDTR
+        //      << endl;
 
         sstr << "Voltage: " << Batt.GetVoltage() << "V; "
              << "Single battery: " << Batt.GetVoltage() / 2 << "V" << endl;
@@ -223,7 +192,7 @@ void TestThreadEntry(void *argument)
         // sum_ns_count++;
         // sstr << "Avg time:" << (float)sum_ns / sum_ns_count << endl;
 
-        // sstr << "Temperature: " << GetCoreTemperature() << endl;
+        sstr << "Temperature: " << GetCoreTemperature();
 
         LvglLock();
         lv_textarea_set_text(ScreenText, sstr.str().c_str());
