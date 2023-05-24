@@ -222,6 +222,11 @@ public:
         return config_data_.touch_number;
     }
 
+    uint8_t NumberOfTouchPoint() const
+    {
+        return number_of_cordinate_;
+    }
+
     bool UpdateTouch()
     {
         if (GetCoordinateState() != true) {

@@ -4,6 +4,7 @@
 #include "user_test.hpp"
 #include "lvgl/lvgl.h"
 #include "lv_port_disp.h"
+#include "lv_port_indev.h"
 #include "lvgl_thread.h"
 
 void StartDefaultTask(void const *argument)
@@ -12,6 +13,7 @@ void StartDefaultTask(void const *argument)
     HAL_Delay(250); // 用于防止进入睡眠模式时无法烧录和调试
     lv_init();
     lv_port_disp_init();
+    lv_port_indev_init();
     StartLvglThread();
     xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 2, nullptr);
     vTaskDelete(nullptr);

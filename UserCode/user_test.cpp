@@ -109,7 +109,7 @@ void TestThreadEntry(void *argument)
 
     // float r = 0, g = 0, b = 0, lightfactor = 1;
 
-    auto init_status = TouchScreen.Init();
+    // auto init_status = TouchScreen.Init();
 
     // xTaskCreate(MavlinkSenderEntry, "MavlinkSender", 512, nullptr, 3, nullptr);
 
@@ -118,14 +118,14 @@ void TestThreadEntry(void *argument)
     while (true) {
         sstr.str("");
 
-        sstr << "init_status: " << init_status << endl;
+        // sstr << "init_status: " << init_status << endl;
 
         sstr << (int)TouchScreen.ConfigVersion() << endl;
         sstr << TouchScreen.MaxOutput_X() << endl;
         sstr << TouchScreen.MaxOutput_Y() << endl;
-        sstr << TouchScreen.MaxTouchNum() << endl;
+        sstr << (int)TouchScreen.MaxTouchNum() << endl;
 
-        TouchScreen.UpdateTouch();
+        // TouchScreen.UpdateTouch();
 
         for (auto point : TouchScreen.touch_points) {
             sstr << (int)point.track_id << ' ' << point.size << ' ' << point.x << ' ' << point.y << endl;
