@@ -197,7 +197,7 @@ static void touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
     TouchScreen.UpdateTouch();
     /*Save the pressed coordinates and the state*/
     if (touchpad_is_pressed()) {
-        data->point.y = TouchScreen.MaxOutput_X() - TouchScreen.touch_points.at(0).x;
+        data->point.y = TouchScreen.MaxOutput_X() - TouchScreen.touch_points.at(0).x - 1;
         data->point.x = TouchScreen.touch_points.at(0).y;
         data->state   = LV_INDEV_STATE_PR;
     } else {
