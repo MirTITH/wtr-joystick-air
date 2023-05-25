@@ -4,3 +4,5 @@
 
 extern Joystick JoystickL;
 extern Joystick JoystickR;
+
+void Joystick_Init();

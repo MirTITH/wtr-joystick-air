@@ -2,6 +2,7 @@
 
 #include "lvgl/lvgl.h"
 #include "lvgl_thread.h"
+#include "lvgl_app.hpp"
 
 class PageMgr
 {
@@ -93,6 +94,11 @@ public:
         lv_obj_move_foreground(page);
         LvglUnlock();
         return true;
+    }
+
+    bool switchToApp(LvglApp &app)
+    {
+        return SwitchToPage(app.app_main_page);
     }
 
     void DelPage(lv_obj_t *page)
