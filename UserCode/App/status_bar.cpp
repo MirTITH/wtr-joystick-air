@@ -1,0 +1,64 @@
+#include "status_bar.hpp"
+#include "lvgl_thread.h"
+#include "Battery/battery_define.hpp"
+#include "Adc/adc_class_define.hpp"
+
+static lv_obj_t *status_bar;
+static lv_obj_t *status_bar_label;
+
+static void StatusBar_Entry(void *argument)
+{
+    (void)argument;
+
+    Adc3.Init();
+    Adc3.StartDma();
+
+    bool is_volt_red          = false;
+    float voltage_threshold_l = 6.1;
+    float voltage_threshold_h = 6.3;
+
+    while (1) {
+        auto voltage = Batt.GetVoltage();
+        if (is_volt_red) {
+            if (voltage > voltage_threshold_h) {
+                is_volt_red = false;
+            }
+        } else {
+            if (voltage < voltage_threshold_l) {
+                is_volt_red = true;
+            }
+        }
+
+        if (is_volt_red) {
+            lv_label_set_text_fmt(status_bar_label, "#ff0000 Volt: %.2f#   Temperature: %.1f", voltage, GetCoreTemperature());
+        } else {
+            lv_label_set_text_fmt(status_bar_label, "Volt: %.2f   Temperature: %.1f", voltage, GetCoreTemperature());
+        }
+
+        vTaskDelay(1000);
+    }
+}
+
+void StatusBar_Init(lv_obj_t *parent)
+{
+    LvglLock();
+    status_bar = lv_obj_create(parent);
+    // lv_obj_remove_style_all(status_bar);
+    lv_obj_set_size(status_bar, lv_pct(100), lv_pct(6));
+    lv_obj_set_style_radius(status_bar, 0, 0);
+    lv_obj_set_style_pad_all(status_bar, 0, 0);
+    lv_obj_set_style_border_side(status_bar, LV_BORDER_SIDE_NONE, 0);
+    lv_obj_set_style_bg_color(status_bar, lv_color_make(128, 128, 128), 0);
+    lv_obj_set_style_bg_opa(status_bar, 180, 0);
+    lv_obj_set_scrollbar_mode(status_bar, LV_SCROLLBAR_MODE_OFF);
+
+    status_bar_label = lv_label_create(status_bar);
+    lv_obj_set_align(status_bar_label, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_color(status_bar_label, lv_color_make(255, 255, 255), 0);
+
+    lv_label_set_recolor(status_bar_label, true);
+
+    LvglUnlock();
+
+    xTaskCreate(StatusBar_Entry, "StatusBar", 256, nullptr, 3, nullptr);
+}

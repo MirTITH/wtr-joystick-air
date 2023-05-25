@@ -119,23 +119,27 @@ private:
     {
         switch (device_id_) {
             case 0xBA:
-                SetRstPin(0);
-                SetIntPinToOutput();
                 SetIntPin(0);
-                HAL_Delay(1);
+                SetIntPinToOutput();
+                SetRstPin(0);
+                HAL_Delay(5);
                 SetRstPin(1);
                 HAL_Delay(10);
                 SetIntPinToInput();
+                HAL_Delay(100);
                 break;
 
             case 0x28:
-                SetRstPin(0);
+                SetIntPin(0);
                 SetIntPinToOutput();
+                SetRstPin(0);
+                HAL_Delay(5);
                 SetIntPin(1);
-                HAL_Delay(1);
+                HAL_Delay(5);
                 SetRstPin(1);
                 HAL_Delay(10);
                 SetIntPinToInput();
+                HAL_Delay(100);
                 break;
 
             default:

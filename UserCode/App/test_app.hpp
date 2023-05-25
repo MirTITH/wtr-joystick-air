@@ -8,44 +8,27 @@
 class TestApp : public LvglApp
 {
 private:
-    bool isGoingToExit = false;
-
+    /* data */
 public:
-    int Run() override
+    using LvglApp::LvglApp; // 使用基类的构造函数
+
+    // virtual int Run() override
+    // {
+    //     return 0;
+    // }
+
+    void Init() override
     {
-        LvglLock();
-        auto textarea = lv_textarea_create(app_screen);
-        lv_obj_set_height(textarea, lv_pct(100));
-        lv_obj_set_width(textarea, lv_pct(100));
-        std::string str;
-        str = "Created by " + app_name;
-        lv_textarea_set_text(textarea, str.c_str());
-        LvglUnlock();
-        while (true) {
-            vTaskDelay(100);
+        auto button = lv_btn_create(app_main_page);
+        lv_obj_center(button);
+        lv_obj_set_size(button, 80, 50);
+        if (app_property.argument != nullptr) {
+            auto label = lv_label_create(button);
+            lv_label_set_text(label, (const char *)app_property.argument);
+            lv_obj_center(label);
         }
-
-        return 0;
-    }
-
-    int OnLaunch() override
-    {
-        return 0;
-    }
-    int OnExit() override
-    {
-        return 0;
-    }
-
-    TestApp(std::string app_name = "Untitled",
-            void *argument       = nullptr,
-            uint16_t stack_depth = 512,
-            uint16_t priority    = 3)
-        : LvglApp(app_name, LvglAppType::Window, argument, stack_depth, priority)
-    {
-    }
-
-    ~TestApp()
-    {
     }
 };
+
+extern TestApp test_app;
+extern TestApp test_app2;

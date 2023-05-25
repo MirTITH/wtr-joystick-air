@@ -10,7 +10,7 @@
 void StartDefaultTask(void const *argument)
 {
     (void)argument;
-    HAL_Delay(250); // 用于防止进入睡眠模式时无法烧录和调试
+    HAL_Delay(1000); // 等待到整个系统稳定
     lv_init();
     lv_port_disp_init();
     lv_port_indev_init();

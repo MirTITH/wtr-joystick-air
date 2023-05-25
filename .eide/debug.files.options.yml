@@ -22,8 +22,11 @@ version: '1.0'
 #
 files:
 #   './test/**/*.c': --c99
-    './UserCode/!(ThirdParty)**': -Wextra
-    # './UserCode/**': -Wextra
+    # './UserCode/*': -Wextra
+    # './UserCode/Lib/!(lvgl)**': -Wextra
+    # './UserCode/App/**': -Wextra
+    './UserCode/**': -Wextra
+    './UserCode/Lib/lvgl/**': -Wno-unused-function -Wno-unused-parameter -Wno-type-limits
 
 #
 # for source files with virtual paths
