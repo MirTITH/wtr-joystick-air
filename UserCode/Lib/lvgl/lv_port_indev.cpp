@@ -94,9 +94,10 @@ void lv_port_indev_init(void)
         indev_drv.read_cb = touchpad_read;
         indev_touchpad    = lv_indev_drv_register(&indev_drv);
 
-        lv_obj_t *mouse_cursor = lv_img_create(lv_scr_act());
-        lv_img_set_src(mouse_cursor, LV_SYMBOL_BACKSPACE);
-        lv_indev_set_cursor(indev_touchpad, mouse_cursor);
+        // 开启指针，用于触摸屏 Debug
+        // lv_obj_t *mouse_cursor = lv_img_create(lv_scr_act());
+        // lv_img_set_src(mouse_cursor, LV_SYMBOL_BACKSPACE);
+        // lv_indev_set_cursor(indev_touchpad, mouse_cursor);
     }
 
     /*------------------

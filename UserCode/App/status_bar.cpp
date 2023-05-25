@@ -43,14 +43,13 @@ void StatusBar_Init(lv_obj_t *parent)
 {
     LvglLock();
     status_bar = lv_obj_create(parent);
-    // lv_obj_remove_style_all(status_bar);
     lv_obj_set_size(status_bar, lv_pct(100), lv_pct(6));
     lv_obj_set_style_radius(status_bar, 0, 0);
     lv_obj_set_style_pad_all(status_bar, 0, 0);
     lv_obj_set_style_border_side(status_bar, LV_BORDER_SIDE_NONE, 0);
     lv_obj_set_style_bg_color(status_bar, lv_color_make(128, 128, 128), 0);
     lv_obj_set_style_bg_opa(status_bar, 180, 0);
-    lv_obj_set_scrollbar_mode(status_bar, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_clear_flag(status_bar, LV_OBJ_FLAG_SCROLLABLE);
 
     status_bar_label = lv_label_create(status_bar);
     lv_obj_set_align(status_bar_label, LV_ALIGN_CENTER);

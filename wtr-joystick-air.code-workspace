@@ -71,7 +71,9 @@
             "chrono": "cpp",
             "ctime": "cpp",
             "ratio": "cpp",
-            "iomanip": "cpp"
+            "iomanip": "cpp",
+            "strstream": "cpp",
+            "map": "cpp"
         },
         "[yaml]": {
             "editor.insertSpaces": true,
