@@ -240,6 +240,10 @@ public:
         if ((coordinate_state_ & 0x80) != 0) {
             number_of_cordinate_ = coordinate_state_ & 0x0F;
             if (number_of_cordinate_ != 0) {
+                if (number_of_cordinate_ > touch_points.size()) {
+                    number_of_cordinate_ = touch_points.size();
+                }
+
                 for (size_t i = 0; i < number_of_cordinate_; i++) {
                     uint8_t buffer[7];
                     if (ReadReg(Gt911Regs::Points[i], buffer, 7) != true) { return false; }

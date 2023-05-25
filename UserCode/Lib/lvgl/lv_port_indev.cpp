@@ -25,9 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void touchpad_init(void);
 static void touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data);
-static bool touchpad_is_pressed(void);
 // static void touchpad_get_xy(lv_coord_t *x, lv_coord_t *y);
 
 // static void mouse_init(void);
@@ -89,17 +87,17 @@ void lv_port_indev_init(void)
      * -----------------*/
 
     /*Initialize your touchpad if you have*/
-    touchpad_init();
+    if (TouchScreen.Init() == true) {
+        /*Register a touchpad input device*/
+        lv_indev_drv_init(&indev_drv);
+        indev_drv.type    = LV_INDEV_TYPE_POINTER;
+        indev_drv.read_cb = touchpad_read;
+        indev_touchpad    = lv_indev_drv_register(&indev_drv);
 
-    /*Register a touchpad input device*/
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type    = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = touchpad_read;
-    indev_touchpad    = lv_indev_drv_register(&indev_drv);
-
-    lv_obj_t *mouse_cursor = lv_img_create(lv_scr_act());
-    lv_img_set_src(mouse_cursor, LV_SYMBOL_BACKSPACE);
-    lv_indev_set_cursor(indev_touchpad, mouse_cursor);
+        lv_obj_t *mouse_cursor = lv_img_create(lv_scr_act());
+        lv_img_set_src(mouse_cursor, LV_SYMBOL_BACKSPACE);
+        lv_indev_set_cursor(indev_touchpad, mouse_cursor);
+    }
 
     /*------------------
      * Mouse
@@ -184,35 +182,19 @@ void lv_port_indev_init(void)
  * Touchpad
  * -----------------*/
 
-/*Initialize your touchpad*/
-static void touchpad_init(void)
-{
-    TouchScreen.Init();
-}
-
 /*Will be called by the library to read the touchpad*/
 static void touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
     (void)indev_drv;
     TouchScreen.UpdateTouch();
     /*Save the pressed coordinates and the state*/
-    if (touchpad_is_pressed()) {
+    if (TouchScreen.NumberOfTouchPoint() != 0) {
         data->point.y = TouchScreen.MaxOutput_X() - TouchScreen.touch_points.at(0).x - 1;
         data->point.x = TouchScreen.touch_points.at(0).y;
         data->state   = LV_INDEV_STATE_PR;
     } else {
         data->state = LV_INDEV_STATE_REL;
     }
-}
-
-/*Return true is the touchpad is pressed*/
-static bool touchpad_is_pressed(void)
-{
-    if (TouchScreen.NumberOfTouchPoint() != 0) {
-        return true;
-    }
-
-    return false;
 }
 
 /*Get the x and y coordinates if the touchpad is pressed*/
