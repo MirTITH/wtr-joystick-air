@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lvgl_app.hpp"
+#include "LvglApp/lvgl_app.hpp"
 #include <string>
 #include "lvgl_thread.h"
 #include <map>

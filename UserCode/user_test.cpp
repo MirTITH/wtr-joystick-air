@@ -9,7 +9,7 @@
 #include "HighPrecisionTime/high_precision_time.h"
 #include "Mavlink/wtr_mavlink.h"
 #include <iomanip>
-#include "app_mgr.hpp"
+#include "LvglApp/app_mgr.hpp"
 #include "test_app.hpp"
 #include "App/dashboard.hpp"
 #include "Joystick/joystick_define.hpp"
@@ -23,41 +23,6 @@
 using namespace std;
 
 DashboardMgr dashboard_mgr("dashboard_mgr");
-
-// void MavlinkSenderEntry(void *argument)
-// {
-//     (void)argument;
-//     wtrMavlink_BindChannel(&huart1, MAVLINK_COMM_0);
-//     mavlink_joystick_air_t msg = {};
-
-//     Joystick::Point_t pos;
-
-//     vTaskDelay(2000);
-
-//     while (true) {
-//         for (size_t i = 0; i < 20; i++) {
-//             msg.buttons[i] = Buttons_Read(i + 1);
-//         }
-
-//         msg.switchs = 0;
-//         msg.switchs |= Buttons_Read(Switch_L);
-//         msg.switchs |= Buttons_Read(Switch_R) << 1;
-
-//         pos              = JoystickL.Pos();
-//         msg.joystickL[0] = pos.x;
-//         msg.joystickL[1] = pos.y;
-
-//         pos              = JoystickR.Pos();
-//         msg.joystickR[0] = pos.x;
-//         msg.joystickR[1] = pos.y;
-
-//         msg.knobs[0] = KnobEncoderL.Count();
-//         msg.knobs[1] = KnobEncoderR.Count();
-
-//         mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_0, &msg);
-//         vTaskDelay(10);
-//     }
-// }
 
 static TickType_t last_3_points_time = 0;
 

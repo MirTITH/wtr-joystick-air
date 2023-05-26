@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lvgl_app.hpp"
+#include "LvglApp/lvgl_app.hpp"
 #include "As69/as69.hpp"
 #include "lvgl/lvgl.h"
 #include "FreeRTOS.h"

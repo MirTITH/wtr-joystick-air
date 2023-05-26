@@ -1,16 +1,14 @@
 #pragma once
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
+#include "stdint.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void StartLvglThread();
-BaseType_t LvglLock();
-BaseType_t LvglUnlock();
+void LvglLock();
+void LvglUnlock();
 
 #ifdef __cplusplus
 }

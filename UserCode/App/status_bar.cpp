@@ -2,6 +2,8 @@
 #include "lvgl_thread.h"
 #include "Battery/battery_define.hpp"
 #include "Adc/adc_class_define.hpp"
+#include "FreeRTOS.h"
+#include "task.h"
 
 static lv_obj_t *status_bar;
 static lv_obj_t *status_bar_label;

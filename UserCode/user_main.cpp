@@ -11,6 +11,9 @@
 #include "Button/buttons.h"
 #include "Led/led_define.hpp"
 #include "Encoder/encoder_define.hpp"
+#include "MavlinkThread/mavlink_thread.hpp"
+#include "FreeRTOS.h"
+#include "task.h"
 
 void StartDefaultTask(void const *argument)
 {
@@ -31,5 +34,7 @@ void StartDefaultTask(void const *argument)
     lv_port_indev_init();
     StartLvglThread();
     xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 2, nullptr);
+    InitMavlinkThread();
+    StartMavlinkThread();
     vTaskDelete(nullptr);
 }

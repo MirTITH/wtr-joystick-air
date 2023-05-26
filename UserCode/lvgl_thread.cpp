@@ -1,17 +1,20 @@
 #include "lvgl_thread.h"
 #include "lvgl/lvgl.h"
 #include "App/status_bar.hpp"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 static SemaphoreHandle_t LvglMutex;
 
-BaseType_t LvglLock()
+void LvglLock()
 {
-    return xSemaphoreTakeRecursive(LvglMutex, portMAX_DELAY);
+    xSemaphoreTakeRecursive(LvglMutex, portMAX_DELAY);
 }
 
-BaseType_t LvglUnlock()
+void LvglUnlock()
 {
-    return xSemaphoreGiveRecursive(LvglMutex);
+    xSemaphoreGiveRecursive(LvglMutex);
 }
 
 static void LvglThreadEntry(void *argument)
