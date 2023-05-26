@@ -14,8 +14,8 @@ static void StatusBar_Entry(void *argument)
     Adc3.StartDma();
 
     bool is_volt_red          = false;
-    float voltage_threshold_l = 6.1;
-    float voltage_threshold_h = 6.3;
+    float voltage_threshold_l = 6.3;
+    float voltage_threshold_h = 6.5;
 
     while (1) {
         auto voltage = Batt.GetVoltage();

@@ -72,8 +72,17 @@ private:
     void SetAddressRoller(uint16_t address)
     {
         for (size_t i = 0; i < 4; i++) {
-            lv_roller_set_selected(address_roller[i], (address >> (4 - i)) & 0xF, LV_ANIM_ON);
+            lv_roller_set_selected(address_roller[i], (address >> (3 - i) * 4) & 0xF, LV_ANIM_ON);
         }
+    }
+
+    uint16_t ReadAddressRoller() const
+    {
+        uint16_t result = 0;
+        for (size_t i = 0; i < 4; i++) {
+            result |= lv_roller_get_selected(address_roller[3 - i]) << i * 4;
+        }
+        return result;
     }
 
     void OnReadBtnClicked()
@@ -117,6 +126,36 @@ private:
 
     void OnWriteBtnClicked()
     {
+        as69_.SetMode(As69::Mode::Sleep);
+        char temp[10];
+        lv_dropdown_get_selected_str(dropdown_baud_rate_, temp, sizeof(temp));
+        auto baudrate = atoi(temp);
+
+        As69::Parity parity;
+        switch (lv_dropdown_get_selected(dropdown_parity_)) {
+            case 0:
+                parity = As69::Parity::None;
+                break;
+            case 1:
+                parity = As69::Parity::Odd;
+                break;
+            case 2:
+                parity = As69::Parity::Even;
+                break;
+            default:
+                return;
+                break;
+        }
+
+        uint8_t wireless_channel = lv_dropdown_get_selected(dropdown_channel_);
+        uint8_t send_power       = lv_dropdown_get_selected(dropdown_power_);
+        uint8_t io_cfg           = lv_dropdown_get_selected(dropdown_io_config_);
+
+        if (as69_.WriteConfig(ReadAddressRoller(), baudrate, parity, wireless_channel, send_power, io_cfg) == true) {
+            lv_label_set_text_static(btn_writeConfigLabel_, "Write success");
+        } else {
+            lv_label_set_text_static(btn_writeConfigLabel_, "Write failed");
+        }
     }
 
     void InitStyles();

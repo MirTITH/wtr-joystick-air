@@ -54,6 +54,8 @@ public:
      */
     bool ReadConfig(uint32_t timeout = 1000);
 
+    bool WriteConfig(uint16_t addr, int32_t baud_rate, Parity parity, uint8_t wireless_channel, uint8_t send_power, uint8_t io_cfg);
+
     /**
      * @brief
      *

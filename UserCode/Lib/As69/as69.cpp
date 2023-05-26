@@ -59,6 +59,86 @@ bool As69::ReadConfig(uint32_t timeout)
     return Read((uint8_t *)&config_data_, sizeof(config_data_), timeout);
 }
 
+As69::ConfigData cfg_data;
+
+bool As69::WriteConfig(uint16_t addr, int32_t baud_rate, Parity parity, uint8_t wireless_channel, uint8_t send_power, uint8_t io_cfg)
+{
+    if (GetMode() != Mode::Sleep) {
+        return false;
+    }
+
+    uint8_t baud_rate_code;
+
+    switch (baud_rate) {
+        case 1200:
+            baud_rate_code = 0;
+            break;
+        case 2400:
+            baud_rate_code = 1;
+            break;
+        case 4800:
+            baud_rate_code = 2;
+            break;
+        case 9600:
+            baud_rate_code = 3;
+            break;
+        case 19200:
+            baud_rate_code = 4;
+            break;
+        case 38400:
+            baud_rate_code = 5;
+            break;
+        case 57600:
+            baud_rate_code = 6;
+            break;
+        case 115200:
+            baud_rate_code = 7;
+            break;
+        default:
+            return false;
+            break;
+    }
+
+    uint8_t parity_code;
+
+    switch (parity) {
+        case Parity::None:
+            parity_code = 0;
+            break;
+        case Parity::Odd:
+            parity_code = 1;
+            break;
+        case Parity::Even:
+            parity_code = 2;
+            break;
+        default:
+            return false;
+            break;
+    }
+
+    cfg_data.byte0 = CMD_SET_CONFIG[0];
+    cfg_data.addrH = addr >> 8;
+    cfg_data.addrL = addr & 0xFF;
+    cfg_data.chan  = wireless_channel & 0xF;
+
+    cfg_data.speed  = (baud_rate_code << 3) | (parity_code << 6);
+    cfg_data.option = (send_power & 0x3) | ((io_cfg & 1) << 6);
+    Write((uint8_t *)&cfg_data, sizeof(cfg_data), HAL_MAX_DELAY);
+    uint8_t response[2] = {};
+    Read(response, sizeof(response), 1000);
+    if (response[0] == 'O' && response[1] == 'K') {
+        for (size_t i = 0; i < 5; i++) {
+            Read(response, sizeof(response), 50); // 清除多余的消息
+        }
+        return true;
+    }
+    for (size_t i = 0; i < 5; i++) {
+        Read(response, sizeof(response), 50); // 清除多余的消息
+    }
+
+    return false;
+}
+
 uint32_t As69::GetModuleBaudRate() const
 {
     uint8_t data = (config_data_.speed & 0x38) >> 3;
