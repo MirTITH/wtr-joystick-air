@@ -11,6 +11,8 @@
 
 #include "wtr_mavlink.h"
 
+volatile uint32_t MavTotalBytesSent = 0;
+
 wtrMavlink_handle_t hMAVLink[MAVLINK_COMM_NUM_BUFFERS] = {0};
 
 void wtrMavlink_BindChannel(UART_HandleTypeDef *huart, mavlink_channel_t chan)

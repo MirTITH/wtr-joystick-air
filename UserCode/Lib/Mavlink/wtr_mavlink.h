@@ -62,6 +62,8 @@ extern wtrMavlink_handle_t hMAVLink[MAVLINK_COMM_NUM_BUFFERS];
 static inline void wtrMavlink_SEND_UART_BYTES(mavlink_channel_t chan, const uint8_t *buf, uint16_t len)
 {
     if (chan < MAVLINK_COMM_NUM_BUFFERS) {
+        extern volatile uint32_t MavTotalBytesSent;
+        MavTotalBytesSent += len;
         while (HAL_UART_Transmit(hMAVLink[chan].huart, (uint8_t *)buf, len, HAL_MAX_DELAY) == HAL_BUSY)
             ;
     } else {
@@ -154,12 +156,12 @@ static inline HAL_StatusTypeDef WTR_UART_Receive_IT(UART_HandleTypeDef *huart, u
         /* Set Reception type to Standard reception */
         huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
 
-        huart->pRxBuffPtr    = pData;
-        huart->RxXferSize    = Size;
-        huart->RxXferCount   = Size;
+        huart->pRxBuffPtr  = pData;
+        huart->RxXferSize  = Size;
+        huart->RxXferCount = Size;
 
-        huart->ErrorCode     = HAL_UART_ERROR_NONE;
-        huart->RxState       = HAL_UART_STATE_BUSY_RX;
+        huart->ErrorCode = HAL_UART_ERROR_NONE;
+        huart->RxState   = HAL_UART_STATE_BUSY_RX;
 
         /* Process Unlocked */
         //   __HAL_UNLOCK(huart);

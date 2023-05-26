@@ -12,7 +12,8 @@
 
 static mavlink_joystick_air_t msg = {};
 static SemaphoreHandle_t mutex_;
-static volatile bool run_state_ = false;
+static volatile bool run_state_            = false;
+static TaskHandle_t *volatile task_handle_ = nullptr;
 
 void MavlinkThreadEntry(void *argument)
 {
@@ -43,7 +44,7 @@ void MavlinkThreadEntry(void *argument)
         mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_0, &msg);
         vTaskDelay(20);
     }
-
+    task_handle_ = nullptr;
     vTaskDelete(nullptr);
 }
 
@@ -67,5 +68,11 @@ void StopMavlinkThread()
 {
     xSemaphoreTake(mutex_, portMAX_DELAY);
     run_state_ = false;
+
+    // 等待结束
+    while (task_handle_ != nullptr) {
+        vTaskDelay(1);
+    }
+
     xSemaphoreGive(mutex_);
 }

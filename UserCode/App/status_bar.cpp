@@ -18,6 +18,10 @@ static void StatusBar_Entry(void *argument)
     bool is_volt_red          = false;
     float voltage_threshold_l = 6.3;
     float voltage_threshold_h = 6.5;
+    extern volatile uint32_t MavTotalBytesSent;
+    uint32_t last_mav_bytes_sent = MavTotalBytesSent;
+    TickType_t last_tick         = xTaskGetTickCount();
+    float mav_send_speed;
 
     while (1) {
         auto voltage = Batt.GetVoltage();
@@ -31,10 +35,14 @@ static void StatusBar_Entry(void *argument)
             }
         }
 
+        mav_send_speed      = (MavTotalBytesSent - last_mav_bytes_sent) / 1.024f / (xTaskGetTickCount() - last_tick);
+        last_tick           = xTaskGetTickCount();
+        last_mav_bytes_sent = MavTotalBytesSent;
+
         if (is_volt_red) {
-            lv_label_set_text_fmt(status_bar_label, "#ff0000 Volt: %.2f#   Temperature: %.1f", voltage, GetCoreTemperature());
+            lv_label_set_text_fmt(status_bar_label, "#ff0000 Volt: %.2f#  Temper: %.1f  Up: %.2f KB", voltage, GetCoreTemperature(), mav_send_speed);
         } else {
-            lv_label_set_text_fmt(status_bar_label, "Volt: %.2f   Temperature: %.1f", voltage, GetCoreTemperature());
+            lv_label_set_text_fmt(status_bar_label, "Volt: %.2f  Temper: %.1f  Up: %.2f KB", voltage, GetCoreTemperature(), mav_send_speed);
         }
 
         vTaskDelay(1000);

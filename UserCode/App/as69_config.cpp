@@ -1,6 +1,7 @@
 #include "as69_config.hpp"
 #include "As69/as69_device.hpp"
 #include "lvgl_thread.h"
+#include "MavlinkThread/mavlink_thread.hpp"
 
 static bool has_inited_style_ = false;
 static lv_style_t btn_style_;
@@ -17,11 +18,13 @@ void As69Config::OnSwUpdated(bool is_sw_checked)
         lv_obj_clear_flag(btn_writeConfig_, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_style(btn_writeConfig_, &btn_inactive_style_, 0);
         as69_.SetMode(As69::Mode::Working);
+        StartMavlinkThread();
     } else {
         lv_obj_add_flag(btn_readConfig_, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_remove_style(btn_readConfig_, &btn_inactive_style_, 0);
         lv_obj_add_flag(btn_writeConfig_, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_remove_style(btn_writeConfig_, &btn_inactive_style_, 0);
+        StopMavlinkThread();
         as69_.SetMode(As69::Mode::Sleep);
     }
 }

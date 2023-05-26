@@ -14,6 +14,7 @@
 #include "MavlinkThread/mavlink_thread.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "As69/as69_device.hpp"
 
 void StartDefaultTask(void const *argument)
 {
@@ -33,8 +34,9 @@ void StartDefaultTask(void const *argument)
     lv_port_disp_init();
     lv_port_indev_init();
     StartLvglThread();
-    xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 2, nullptr);
+    InternalAs69.Init();
     InitMavlinkThread();
-    StartMavlinkThread();
+    xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 2, nullptr);
+    // StartMavlinkThread();
     vTaskDelete(nullptr);
 }

@@ -29,6 +29,7 @@ void As69::SetMode(Mode mode)
             SetBaudRate(baudrate_);
             HAL_GPIO_WritePin(md1_gpio_port_, md1_gpio_pin_, GPIO_PIN_RESET);
             HAL_Delay(200);
+            SetBaudRate(baudrate_);
             break;
         case Mode::Sleep:
             HAL_GPIO_WritePin(md1_gpio_port_, md1_gpio_pin_, GPIO_PIN_SET);
@@ -127,9 +128,9 @@ bool As69::WriteConfig(uint16_t addr, int32_t baud_rate, Parity parity, uint8_t 
     uint8_t response[2] = {};
     Read(response, sizeof(response), 1000);
     if (response[0] == 'O' && response[1] == 'K') {
-        for (size_t i = 0; i < 5; i++) {
-            Read(response, sizeof(response), 50); // 清除多余的消息
-        }
+        config_data_ = cfg_data;
+        baudrate_    = baud_rate;
+        Read(response, sizeof(response), 50); // 清除多余的消息
         return true;
     }
     for (size_t i = 0; i < 5; i++) {
