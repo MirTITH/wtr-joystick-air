@@ -14,6 +14,7 @@
 #include "App/dashboard.hpp"
 #include "Joystick/joystick_define.hpp"
 #include "Encoder/encoder_define.hpp"
+#include "as69_config.hpp"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -64,35 +65,12 @@ void TestThreadEntry(void *argument)
     (void)argument;
 
     AppMgr_Init();
-    AppMgr_LaunchApp(dashboard_mgr, MainWindow, nullptr);
-    auto time_dashboard      = dashboard_mgr.NewDashboard(0, "Time");
-    auto encoder_dashboard   = dashboard_mgr.NewDashboard(1, "Encoder");
-    auto joystickl_dashboard = dashboard_mgr.NewDashboard(2, "JoystickL");
-    auto joystickr_dashboard = dashboard_mgr.NewDashboard(3, "JoystickR");
-    vTaskDelay(1000);
-    dashboard_mgr.NewDashboard(123, "Test");
-    vTaskDelay(1000);
-    dashboard_mgr.NewDashboard(112, "Test2");
-    vTaskDelay(1000);
-    dashboard_mgr.NewDashboard(23, "Test");
-    vTaskDelay(1000);
-    dashboard_mgr.NewDashboard(232, "Hahahaha");
-    vTaskDelay(1000);
-
-    dashboard_mgr.DelDashboard(232);
-    vTaskDelay(1000);
-    dashboard_mgr.NewDashboard(232, "Yeee");
-    vTaskDelay(1000);
-    dashboard_mgr.NewDashboard(232, "Wahaha");
-    vTaskDelay(1000);
-    // AppMgr_LaunchApp(test_app2, MainWindow, (char *)"Btn2");
-
-    // Dashboard dashboard;
-    // dashboard.Init()
-    // while (true) {
-    //     vTaskDelay(2000);
-    //     MainWindow.switchToApp(test_app);
-    // }
+    AppMgr_LaunchApp(InternalAs69Config, MainWindow, nullptr);
+    // AppMgr_LaunchApp(dashboard_mgr, MainWindow, nullptr);
+    // auto time_dashboard      = dashboard_mgr.NewDashboard(0, "Time");
+    // auto encoder_dashboard   = dashboard_mgr.NewDashboard(1, "Encoder");
+    // auto joystickl_dashboard = dashboard_mgr.NewDashboard(2, "JoystickL");
+    // auto joystickr_dashboard = dashboard_mgr.NewDashboard(3, "JoystickR");
 
     stringstream sstr;
     sstr.precision(4);
@@ -101,16 +79,17 @@ void TestThreadEntry(void *argument)
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
     while (true) {
-        time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
-        sstr.str("");
-        sstr << JoystickL.Pos().x << "," << JoystickL.Pos().y;
-        joystickl_dashboard->SetMsg(sstr.str());
-        sstr.str("");
-        sstr << JoystickR.Pos().x << "," << JoystickR.Pos().y;
-        joystickr_dashboard->SetMsg(sstr.str());
-        sstr.str("");
-        sstr << KnobEncoderR.Count() << "," << KnobEncoderL.Count();
-        encoder_dashboard->SetMsg(sstr.str());
-        vTaskDelayUntil(&PreviousWakeTime, 20);
+        // time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
+        // sstr.str("");
+        // sstr << JoystickL.Pos().x << "," << JoystickL.Pos().y;
+        // joystickl_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // sstr << JoystickR.Pos().x << "," << JoystickR.Pos().y;
+        // joystickr_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // sstr << KnobEncoderR.Count() << "," << KnobEncoderL.Count();
+        // encoder_dashboard->SetMsg(sstr.str());
+
+        vTaskDelayUntil(&PreviousWakeTime, 50);
     }
 }
