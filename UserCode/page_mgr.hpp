@@ -96,7 +96,7 @@ public:
         return true;
     }
 
-    bool switchToApp(LvglApp &app)
+    bool SwitchToApp(LvglApp &app)
     {
         return SwitchToPage(app.app_main_page);
     }
