@@ -1,9 +1,30 @@
 #include "as69_config.hpp"
 #include "As69/as69_device.hpp"
+#include "lvgl_thread.h"
 
 static bool has_inited_style_ = false;
 static lv_style_t btn_style_;
+static lv_style_t btn_inactive_style_;
 static lv_style_t setting_tab_style_;
+
+void As69Config::OnSwUpdated(bool is_sw_checked)
+{
+    lv_label_set_text_static(sw_cmd_label_, is_sw_checked ? "As69\nWork\nMode" : "As69\nConfig\nMode");
+    lv_obj_align_to(sw_cmd_label_, sw_cmd_, LV_ALIGN_OUT_TOP_MID, 0, -10);
+    if (is_sw_checked) {
+        lv_obj_clear_flag(btn_readConfig_, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_style(btn_readConfig_, &btn_inactive_style_, 0);
+        lv_obj_clear_flag(btn_writeConfig_, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_style(btn_writeConfig_, &btn_inactive_style_, 0);
+        as69_.SetMode(As69::Mode::Working);
+    } else {
+        lv_obj_add_flag(btn_readConfig_, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_remove_style(btn_readConfig_, &btn_inactive_style_, 0);
+        lv_obj_add_flag(btn_writeConfig_, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_remove_style(btn_writeConfig_, &btn_inactive_style_, 0);
+        as69_.SetMode(As69::Mode::Sleep);
+    }
+}
 
 void As69Config::InitStyles()
 {
@@ -17,6 +38,9 @@ void As69Config::InitStyles()
         lv_style_set_width(&setting_tab_style_, lv_pct(100));
         lv_style_set_height(&setting_tab_style_, 50);
         lv_style_set_pad_all(&setting_tab_style_, 4);
+
+        lv_style_init(&btn_inactive_style_);
+        lv_style_set_bg_color(&btn_inactive_style_, lv_color_make(127, 127, 127));
     }
 }
 
@@ -31,7 +55,7 @@ lv_obj_t *As69Config::CreateTab(lv_obj_t *parent, const std::string &title)
     return tab;
 }
 
-lv_obj_t *As69Config::CreateSettingTab(lv_obj_t *parent, const std::string &title, const char *options)
+lv_obj_t *As69Config::CreateDropdownTab(lv_obj_t *parent, const std::string &title, const char *options)
 {
     lv_obj_t *tab = CreateTab(parent, title);
 
@@ -39,7 +63,7 @@ lv_obj_t *As69Config::CreateSettingTab(lv_obj_t *parent, const std::string &titl
     lv_dropdown_set_options(dropdown, options);
     lv_obj_align(dropdown, LV_ALIGN_RIGHT_MID, 0, 0);
 
-    return tab;
+    return dropdown;
 }
 
 lv_obj_t *As69Config::Create4RollerTab(lv_obj_t *parent, const std::string &title, const char *option)
@@ -54,36 +78,35 @@ lv_obj_t *As69Config::Create4RollerTab(lv_obj_t *parent, const std::string &titl
     lv_obj_set_style_align(label, LV_ALIGN_TOP_MID, 0);
 
     /*A roller on the middle with center aligned text, and auto (default) width*/
-    auto roller1 = lv_roller_create(tab);
-    lv_obj_set_width(roller1, 40);
-    lv_roller_set_options(roller1, option, LV_ROLLER_MODE_INFINITE);
-    lv_roller_set_visible_row_count(roller1, 3);
-    lv_obj_align(roller1, LV_ALIGN_BOTTOM_MID, -60, 0);
-    // lv_obj_add_event_cb(roller1, event_handler, LV_EVENT_ALL, NULL);
-    // lv_roller_set_selected(roller1, 5, LV_ANIM_OFF);
+    address_roller[0] = lv_roller_create(tab);
+    lv_obj_set_width(address_roller[0], 40);
+    lv_roller_set_options(address_roller[0], option, LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_visible_row_count(address_roller[0], 3);
+    lv_obj_align(address_roller[0], LV_ALIGN_BOTTOM_MID, -60, 0);
 
-    auto roller2 = lv_roller_create(tab);
-    lv_obj_set_width(roller2, 40);
-    lv_roller_set_options(roller2, option, LV_ROLLER_MODE_INFINITE);
-    lv_roller_set_visible_row_count(roller2, 3);
-    lv_obj_align(roller2, LV_ALIGN_BOTTOM_MID, -20, 0);
+    address_roller[1] = lv_roller_create(tab);
+    lv_obj_set_width(address_roller[1], 40);
+    lv_roller_set_options(address_roller[1], option, LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_visible_row_count(address_roller[1], 3);
+    lv_obj_align(address_roller[1], LV_ALIGN_BOTTOM_MID, -20, 0);
 
-    auto roller3 = lv_roller_create(tab);
-    lv_obj_set_width(roller3, 40);
-    lv_roller_set_options(roller3, option, LV_ROLLER_MODE_INFINITE);
-    lv_roller_set_visible_row_count(roller3, 3);
-    lv_obj_align(roller3, LV_ALIGN_BOTTOM_MID, 20, 0);
+    address_roller[2] = lv_roller_create(tab);
+    lv_obj_set_width(address_roller[2], 40);
+    lv_roller_set_options(address_roller[2], option, LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_visible_row_count(address_roller[2], 3);
+    lv_obj_align(address_roller[2], LV_ALIGN_BOTTOM_MID, 20, 0);
 
-    auto roller4 = lv_roller_create(tab);
-    lv_obj_set_width(roller4, 40);
-    lv_roller_set_options(roller4, option, LV_ROLLER_MODE_INFINITE);
-    lv_roller_set_visible_row_count(roller4, 3);
-    lv_obj_align(roller4, LV_ALIGN_BOTTOM_MID, 60, 0);
+    address_roller[3] = lv_roller_create(tab);
+    lv_obj_set_width(address_roller[3], 40);
+    lv_roller_set_options(address_roller[3], option, LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_visible_row_count(address_roller[3], 3);
+    lv_obj_align(address_roller[3], LV_ALIGN_BOTTOM_MID, 60, 0);
     return tab;
 }
 
 void As69Config::Init()
 {
+    LvglLock();
     InitStyles();
     lv_obj_set_style_pad_all(app_main_page, 4, 0);
     lv_obj_set_flex_flow(app_main_page, LV_FLEX_FLOW_COLUMN);
@@ -104,7 +127,6 @@ void As69Config::Init()
     lv_obj_add_event_cb(sw_cmd_, As69Config::sw_event_handler, LV_EVENT_VALUE_CHANGED, this);
     sw_cmd_label_ = lv_label_create(head_tab);
     lv_obj_set_style_text_align(sw_cmd_label_, LV_TEXT_ALIGN_CENTER, 0);
-    SetSwLabel(lv_obj_has_state(sw_cmd_, LV_STATE_CHECKED));
 
     btn_tab_ = lv_obj_create(head_tab);
     lv_obj_set_style_border_side(btn_tab_, LV_BORDER_SIDE_NONE, 0);
@@ -121,49 +143,54 @@ void As69Config::Init()
     btn_readConfigLabel_ = lv_label_create(btn_readConfig_);
     lv_label_set_text_static(btn_readConfigLabel_, "Read config");
     lv_obj_center(btn_readConfigLabel_);
+    lv_obj_add_event_cb(btn_readConfig_, As69Config::readBtn_event_handler, LV_EVENT_CLICKED, this);
 
     btn_writeConfig_ = lv_btn_create(btn_tab_);
     lv_obj_add_style(btn_writeConfig_, &btn_style_, 0);
     btn_writeConfigLabel_ = lv_label_create(btn_writeConfig_);
     lv_label_set_text_static(btn_writeConfigLabel_, "Write config");
     lv_obj_center(btn_writeConfigLabel_);
+    lv_obj_add_event_cb(btn_writeConfig_, As69Config::writeBtn_event_handler, LV_EVENT_CLICKED, this);
+
+    OnSwUpdated(lv_obj_has_state(sw_cmd_, LV_STATE_CHECKED)); // 这个函数会更新按钮状态，所以要在创建按钮后执行
 
     lv_obj_t *tab_address = Create4RollerTab(head_tab, "Address", "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\nA\nB\nC\nD\nE\nF");
     lv_obj_align(tab_address, LV_ALIGN_RIGHT_MID, -10, 0);
 
-    lv_obj_t *tab_baud_rate = CreateSettingTab(app_main_page, "Baud rate", "1200\n"
-                                                                           "2400\n"
-                                                                           "4800\n"
-                                                                           "9600\n"
-                                                                           "19200\n"
-                                                                           "38400\n"
-                                                                           "57600\n"
-                                                                           "115200");
+    dropdown_baud_rate_ = CreateDropdownTab(app_main_page, "Baud rate", "1200\n"
+                                                                        "2400\n"
+                                                                        "4800\n"
+                                                                        "9600\n"
+                                                                        "19200\n"
+                                                                        "38400\n"
+                                                                        "57600\n"
+                                                                        "115200");
 
-    lv_obj_t *tab_parity = CreateSettingTab(app_main_page, "Parity", "None\n"
-                                                                     "Odd\n"
-                                                                     "Even");
+    dropdown_parity_ = CreateDropdownTab(app_main_page, "Parity", "None\n"
+                                                                  "Odd\n"
+                                                                  "Even");
 
-    lv_obj_t *tab_channel = CreateSettingTab(app_main_page, "Wireless Channel(Wireless Freq)", "0x00\n"
-                                                                                               "0x01\n"
-                                                                                               "0x02\n"
-                                                                                               "0x03\n"
-                                                                                               "0x04\n"
-                                                                                               "0x05\n"
-                                                                                               "0x06\n"
-                                                                                               "0x07\n"
-                                                                                               "0x08\n"
-                                                                                               "0x09\n"
-                                                                                               "0x0A\n"
-                                                                                               "0x0B\n"
-                                                                                               "0x0C");
+    dropdown_channel_ = CreateDropdownTab(app_main_page, "Wireless Channel(Wireless Freq)", "0x00\n"
+                                                                                            "0x01\n"
+                                                                                            "0x02\n"
+                                                                                            "0x03\n"
+                                                                                            "0x04\n"
+                                                                                            "0x05\n"
+                                                                                            "0x06\n"
+                                                                                            "0x07\n"
+                                                                                            "0x08\n"
+                                                                                            "0x09\n"
+                                                                                            "0x0A\n"
+                                                                                            "0x0B\n"
+                                                                                            "0x0C");
 
-    lv_obj_t *tab_power = CreateSettingTab(app_main_page, "Send power", "20dBm\n"
-                                                                        "12dBm\n"
-                                                                        "10dBm\n"
-                                                                        "5dBm");
+    dropdown_power_ = CreateDropdownTab(app_main_page, "Send power", "20dBm\n"
+                                                                     "12dBm\n"
+                                                                     "10dBm\n"
+                                                                     "5dBm");
 
-    CreateSettingTab(app_main_page, "IO config", "Push pull\nPull up");
+    dropdown_io_config_ = CreateDropdownTab(app_main_page, "IO config", "Pull up\nPush pull");
+    LvglUnlock();
 }
 
 As69Config InternalAs69Config(InternalAs69);
