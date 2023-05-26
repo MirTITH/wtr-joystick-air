@@ -17,11 +17,19 @@
             <field type="float" name="b"> range: [0, 1] </field>
             <field type="float" name="lightness"> Gain of lightness. Must be positive values </field>
         </message>
-        <message id="211" name="JOYSTICK_AIR_Dashboard">
-            <description>Show message and values on remote controller</description>
+        <message id="211" name="JOYSTICK_AIR_DASHBOARD_NEW">
+            <description>create a new dashboard</description>
             <field type="uint8_t" name="id"></field>
             <field type="char[20]" name="title"></field>
-            <field type="float" name="value"> </field>
+        </message>
+        <message id="212" name="JOYSTICK_AIR_DASHBOARD_SET_MSG">
+            <description>set message</description>
+            <field type="uint8_t" name="id"></field>
+            <field type="char[20]" name="message"></field>
+        </message>
+        <message id="213" name="JOYSTICK_AIR_DASHBOARD_DEL">
+            <description>delete a dashboard</description>
+            <field type="uint8_t" name="id"></field>
         </message>
     </messages>
 </mavlink>
