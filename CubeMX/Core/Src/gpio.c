@@ -61,7 +61,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(Wifi_Rst_GPIO_Port, Wifi_Rst_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(AS69_MD1_GPIO_Port, AS69_MD1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, AS69_MD1_Pin|Kb_MC1_Pin|Kb_MC2_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(Kb_MR1_GPIO_Port, Kb_MR1_Pin, GPIO_PIN_SET);
@@ -71,9 +71,6 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(Kb_MR4_GPIO_Port, Kb_MR4_Pin, GPIO_PIN_SET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, Kb_MC1_Pin|Kb_MC2_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(Tp_Rst_GPIO_Port, Tp_Rst_Pin, GPIO_PIN_RESET);

@@ -36,7 +36,7 @@ void StartDefaultTask(void const *argument)
     StartLvglThread();
     InternalAs69.Init();
     InitMavlinkThread();
-    xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 2, nullptr);
+    xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 3, nullptr);
     // StartMavlinkThread();
     vTaskDelete(nullptr);
 }

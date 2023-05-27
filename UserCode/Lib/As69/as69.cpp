@@ -15,7 +15,13 @@ bool As69::SetBaudRate(uint32_t new_baud_rate)
 bool As69::Init()
 {
     baudrate_ = huart_->Init.BaudRate;
-    SetMode(Mode::Sleep);
+
+    if (GetMode() != Mode::Sleep) {
+        SetMode(Mode::Sleep);
+    } else {
+        SetBaudRate(9600);
+    }
+
     if (ReadConfig() == false) return false;
     baudrate_ = GetModuleBaudRate();
     SetMode(Mode::Working);

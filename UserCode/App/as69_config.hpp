@@ -67,7 +67,13 @@ private:
         }
     }
 
-    void OnSwUpdated(bool is_sw_checked);
+    /**
+     * @brief As69 开关更新事件
+     *
+     * @param is_sw_checked 开关状态
+     * @param apply_modify 是否将更改应用至系统中，如果选否，则只应用在界面效果上
+     */
+    void OnSwUpdated(bool is_sw_checked, bool apply_modify = true);
 
     void SetAddressRoller(uint16_t address)
     {
@@ -85,10 +91,20 @@ private:
         return result;
     }
 
-    void OnReadBtnClicked()
+    /**
+     * @brief
+     *
+     * @param read_from_As69 true: 则会从 As69 模块中更新配置; false 从缓存中读取配置
+     */
+    void OnReadBtnClicked(bool read_from_As69 = true)
     {
-        as69_.SetMode(As69::Mode::Sleep);
-        if (as69_.ReadConfig() == true) {
+        bool read_status = true;
+
+        if (read_from_As69) {
+            read_status = as69_.ReadConfig();
+        }
+
+        if (read_status == true) {
             lv_label_set_text_static(btn_readConfigLabel_, "Read success");
 
             auto baudrate = as69_.GetModuleBaudRate();
@@ -126,7 +142,6 @@ private:
 
     void OnWriteBtnClicked()
     {
-        as69_.SetMode(As69::Mode::Sleep);
         char temp[10];
         lv_dropdown_get_selected_str(dropdown_baud_rate_, temp, sizeof(temp));
         auto baudrate = atoi(temp);

@@ -8,7 +8,7 @@ static lv_style_t btn_style_;
 static lv_style_t btn_inactive_style_;
 static lv_style_t setting_tab_style_;
 
-void As69Config::OnSwUpdated(bool is_sw_checked)
+void As69Config::OnSwUpdated(bool is_sw_checked, bool apply_modify)
 {
     lv_label_set_text_static(sw_cmd_label_, is_sw_checked ? "As69\nWork\nMode" : "As69\nConfig\nMode");
     lv_obj_align_to(sw_cmd_label_, sw_cmd_, LV_ALIGN_OUT_TOP_MID, 0, -10);
@@ -17,15 +17,20 @@ void As69Config::OnSwUpdated(bool is_sw_checked)
         lv_obj_add_style(btn_readConfig_, &btn_inactive_style_, 0);
         lv_obj_clear_flag(btn_writeConfig_, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_style(btn_writeConfig_, &btn_inactive_style_, 0);
-        as69_.SetMode(As69::Mode::Working);
-        StartMavlinkThread();
+        if (apply_modify) {
+            as69_.SetMode(As69::Mode::Working);
+            StartMavlinkThread();
+        }
+
     } else {
         lv_obj_add_flag(btn_readConfig_, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_remove_style(btn_readConfig_, &btn_inactive_style_, 0);
         lv_obj_add_flag(btn_writeConfig_, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_remove_style(btn_writeConfig_, &btn_inactive_style_, 0);
-        StopMavlinkThread();
-        as69_.SetMode(As69::Mode::Sleep);
+        if (apply_modify) {
+            StopMavlinkThread();
+            as69_.SetMode(As69::Mode::Sleep);
+        }
     }
 }
 
@@ -155,7 +160,7 @@ void As69Config::Init()
     lv_obj_center(btn_writeConfigLabel_);
     lv_obj_add_event_cb(btn_writeConfig_, As69Config::writeBtn_event_handler, LV_EVENT_CLICKED, this);
 
-    OnSwUpdated(lv_obj_has_state(sw_cmd_, LV_STATE_CHECKED)); // 这个函数会更新按钮状态，所以要在创建按钮后执行
+    OnSwUpdated(lv_obj_has_state(sw_cmd_, LV_STATE_CHECKED), true); // 这个函数会更新按钮状态，所以要在创建按钮后执行
 
     lv_obj_t *tab_address = Create4RollerTab(head_tab, "Address", "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\nA\nB\nC\nD\nE\nF");
     lv_obj_align(tab_address, LV_ALIGN_RIGHT_MID, -10, 0);
@@ -193,6 +198,8 @@ void As69Config::Init()
                                                                      "5dBm");
 
     dropdown_io_config_ = CreateDropdownTab(app_main_page, "IO config", "Pull up\nPush pull");
+
+    OnReadBtnClicked(false); // 从缓存中获取配置
     LvglUnlock();
 }
 
