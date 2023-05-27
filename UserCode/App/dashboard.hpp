@@ -110,10 +110,10 @@ public:
     {
         LvglLock();
         auto iter = dashboards.find(id);
+        LvglUnlock();
         if (iter != dashboards.end()) {
             return iter->second;
         }
-        LvglUnlock();
         return nullptr;
     }
 

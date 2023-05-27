@@ -27,13 +27,6 @@ static mavlink_joystick_air_dashboard_set_msg_t msg_dashboard_set_msg_;
 volatile bool got_msg_dashboard_del_ = false;
 static mavlink_joystick_air_dashboard_del_t msg_dashboard_del_;
 
-SemaphoreHandle_t MavUartTxSem;
-
-volatile uint32_t MavTxCpltCount = 0;
-extern volatile uint32_t MavTotalBytesSent;
-
-mavlink_message_t send_buffer;
-
 static void SendMsg()
 {
     msg_to_send_.buttons = 0;
@@ -57,11 +50,7 @@ static void SendMsg()
     msg_to_send_.knobs[0] = KnobEncoderL.Count();
     msg_to_send_.knobs[1] = KnobEncoderR.Count();
 
-    auto length = mavlink_msg_joystick_air_encode(mavlink_system.sysid, mavlink_system.compid, &send_buffer, &msg_to_send_);
-    MavTotalBytesSent += length;
-    // mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_0, &msg_to_send_);
-    xSemaphoreTake(MavUartTxSem, portMAX_DELAY);
-    HAL_UART_Transmit_DMA(hMAVLink[MAVLINK_COMM_0].huart, (const uint8_t *)&send_buffer, length);
+    mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_0, &msg_to_send_);
 }
 
 static void ProcessLed()
@@ -119,7 +108,6 @@ void MavlinkThreadEntry(void *argument)
     thread_run_state_ = true;
 
     wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);
-    xSemaphoreGive(MavUartTxSem);
 
     while (run_control_ == true) {
         Buttons_Scan();
@@ -127,10 +115,10 @@ void MavlinkThreadEntry(void *argument)
         ProcessLed();
         ProcessDashboard();
 
-        vTaskDelay(100);
+        vTaskDelay(20);
     }
+
     wtrMavlink_StopReceiveIT(MAVLINK_COMM_0);
-    xSemaphoreTake(MavUartTxSem, portMAX_DELAY); // 等待发送完成
 
     thread_run_state_ = false;
     vTaskDelete(nullptr);
@@ -138,8 +126,7 @@ void MavlinkThreadEntry(void *argument)
 
 void InitMavlinkThread()
 {
-    mutex_       = xSemaphoreCreateMutex();
-    MavUartTxSem = xSemaphoreCreateBinary();
+    mutex_ = xSemaphoreCreateMutex();
     wtrMavlink_BindChannel(&huart1, MAVLINK_COMM_0);
 }
 

@@ -14,13 +14,13 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "main.h"
 #include "mavlink_types.h"
 #include "usart.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /***********************************
  * 以下为移植到新平台后建议的配置
@@ -65,8 +65,7 @@ static inline void wtrMavlink_SEND_UART_BYTES(mavlink_channel_t chan, const uint
     if (chan < MAVLINK_COMM_NUM_BUFFERS) {
         extern volatile uint32_t MavTotalBytesSent;
         MavTotalBytesSent += len;
-        while (HAL_UART_Transmit(hMAVLink[chan].huart, (uint8_t *)buf, len, HAL_MAX_DELAY) == HAL_BUSY)
-            ;
+        while (HAL_UART_Transmit(hMAVLink[chan].huart, (uint8_t *)buf, len, HAL_MAX_DELAY) == HAL_BUSY) {};
     } else {
         // 如果卡在这里，说明 chan 超过了最大值
         // 请检查通道号是否给错
@@ -194,7 +193,7 @@ static inline void wtrMavlink_UARTRxCpltCallback(UART_HandleTypeDef *huart, mavl
 {
     extern volatile uint32_t MavTotalBytesGot;
     if (chan < MAVLINK_COMM_NUM_BUFFERS) {
-        if (huart == hMAVLink[chan].huart) {
+        if (huart->Instance == hMAVLink[chan].huart->Instance) {
             MavTotalBytesGot++;
             if (mavlink_parse_char(chan, hMAVLink[chan].rx_buffer, &(hMAVLink[chan].msg), &(hMAVLink[chan].status))) {
                 wtrMavlink_MsgRxCpltCallback(&(hMAVLink[chan].msg));
@@ -210,6 +209,28 @@ static inline void wtrMavlink_UARTRxCpltCallback(UART_HandleTypeDef *huart, mavl
         while (1) {}
     }
 }
+
+// /**
+//  * @brief 这个函数需要在 HAL_UART_TxCpltCallback 中调用
+//  *
+//  * @param huart 串口（函数内部有判断，只有这个 huart 是 channel 对应的 huart 时，该函数才会处理）
+//  * @param chan
+//  */
+// static inline void wtrMavlink_UARTTxCpltCallback(UART_HandleTypeDef *huart, mavlink_channel_t chan)
+// {
+//     if (chan < MAVLINK_COMM_NUM_BUFFERS) {
+//         if (huart->Instance == hMAVLink[chan].huart->Instance) {
+//             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+//             xSemaphoreGiveFromISR(hMAVLink[chan].tx_sem, &xHigherPriorityTaskWoken);
+//             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+//         }
+//     } else {
+//         // 如果卡在这里，说明 chan 超过了最大值
+//         // 请检查通道号是否给错
+//         // 如果当前通道数量不够用，请增大 wtr_mavlink.h 中 MAVLINK_COMM_NUM_BUFFERS 的值
+//         while (1) {}
+//     }
+// }
 
 #ifdef __cplusplus
 }

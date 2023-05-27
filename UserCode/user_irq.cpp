@@ -15,19 +15,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);
 }
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
+// void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+// {
+//     TxIntCount++;
+//     // wtrMavlink_UARTTxCpltCallback(huart, MAVLINK_COMM_0);
+//     // if (huart->Instance == hMAVLink[MAVLINK_COMM_0].huart->Instance) {
+//     //     // extern SemaphoreHandle_t MavUartTxSem;
+//     //     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    if (huart->Instance == hMAVLink[MAVLINK_COMM_0].huart->Instance) {
-        extern volatile uint32_t MavTxCpltCount;
-        extern SemaphoreHandle_t MavUartTxSem;
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-        MavTxCpltCount++;
-        xSemaphoreGiveFromISR(MavUartTxSem, &xHigherPriorityTaskWoken);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    }
-}
+//     //     xSemaphoreGiveFromISR(MavUartTxSem, &xHigherPriorityTaskWoken);
+//     //     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+//     // }
+// }
 
 // void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 // {
