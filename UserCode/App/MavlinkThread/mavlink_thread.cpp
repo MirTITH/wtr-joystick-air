@@ -177,7 +177,7 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
     switch (msg->msgid) {
         case MAVLINK_MSG_ID_JOYSTICK_AIR_LED:
             mavlink_msg_joystick_air_led_decode(msg, &msg_led_);
-            led_until_tick_ = xTaskGetTickCountFromISR() + msg_led_.Duration;
+            led_until_tick_ = xTaskGetTickCountFromISR() + msg_led_.duration;
             break;
         case MAVLINK_MSG_ID_JOYSTICK_AIR_DASHBOARD_SET_TITLE:
             mavlink_msg_joystick_air_dashboard_set_title_decode(msg, &msg_dashboard_set_title_);
