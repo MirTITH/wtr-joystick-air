@@ -160,7 +160,7 @@ void As69Config::Init()
     lv_obj_center(btn_writeConfigLabel_);
     lv_obj_add_event_cb(btn_writeConfig_, As69Config::writeBtn_event_handler, LV_EVENT_CLICKED, this);
 
-    OnSwUpdated(lv_obj_has_state(sw_cmd_, LV_STATE_CHECKED), true); // 这个函数会更新按钮状态，所以要在创建按钮后执行
+    OnSwUpdated(lv_obj_has_state(sw_cmd_, LV_STATE_CHECKED), false); // 这个函数会更新按钮状态，所以要在创建按钮后执行
 
     lv_obj_t *tab_address = Create4RollerTab(head_tab, "Address", "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\nA\nB\nC\nD\nE\nF");
     lv_obj_align(tab_address, LV_ALIGN_RIGHT_MID, -10, 0);

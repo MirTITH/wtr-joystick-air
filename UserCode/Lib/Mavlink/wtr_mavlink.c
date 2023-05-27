@@ -33,14 +33,27 @@ int wtrMavlink_StartReceiveIT(mavlink_channel_t chan)
         if (hMAVLink[chan].huart == NULL) {
             return -1;
         }
+        hMAVLink[chan].is_receiving = 1;
 
-        return WTR_UART_Receive_IT(hMAVLink[chan].huart, &(hMAVLink[chan].rx_buffer), 1);
+        return HAL_UART_Receive_IT(hMAVLink[chan].huart, &(hMAVLink[chan].rx_buffer), 1);
     } else {
         // 如果卡在这里，说明 chan 超过了最大值
         // 请检查通道号是否给错
         // 如果当前通道数量不够用，请增大 wtr_mavlink.h 中 MAVLINK_COMM_NUM_BUFFERS 的值
         while (1) {}
         return -1;
+    }
+}
+
+void wtrMavlink_StopReceiveIT(mavlink_channel_t chan)
+{
+    if (chan < MAVLINK_COMM_NUM_BUFFERS) {
+        if (hMAVLink[chan].huart == NULL) {
+            return;
+        }
+        hMAVLink[chan].is_receiving = 0;
+
+        HAL_UART_Abort_IT(hMAVLink[chan].huart);
     }
 }
 

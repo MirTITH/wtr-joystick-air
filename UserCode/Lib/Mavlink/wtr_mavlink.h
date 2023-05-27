@@ -46,6 +46,7 @@ typedef struct
     uint8_t rx_buffer;         // 接收缓冲
     mavlink_message_t msg;     // the message data
     mavlink_status_t status;   // 统计信息
+    uint8_t is_receiving;      // 是否在接收
 } wtrMavlink_handle_t;
 
 // mavlink 支持多个通道，使用全局句柄方便对每一个通道配置（通常，一个通道对应一个串口）
@@ -142,44 +143,44 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg);
  * @param Size
  * @return HAL_StatusTypeDef
  */
-static inline HAL_StatusTypeDef WTR_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
-{
-    /* Check that a Rx process is not already ongoing */
-    if (huart->RxState == HAL_UART_STATE_READY) {
-        if ((pData == NULL) || (Size == 0U)) {
-            return HAL_ERROR;
-        }
+// static inline HAL_StatusTypeDef WTR_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
+// {
+//     /* Check that a Rx process is not already ongoing */
+//     if (huart->RxState == HAL_UART_STATE_READY) {
+//         if ((pData == NULL) || (Size == 0U)) {
+//             return HAL_ERROR;
+//         }
 
-        /* Process Locked */
-        // __HAL_LOCK(huart);
+//         /* Process Locked */
+//         // __HAL_LOCK(huart);
 
-        /* Set Reception type to Standard reception */
-        huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
+//         /* Set Reception type to Standard reception */
+//         huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
 
-        huart->pRxBuffPtr  = pData;
-        huart->RxXferSize  = Size;
-        huart->RxXferCount = Size;
+//         huart->pRxBuffPtr  = pData;
+//         huart->RxXferSize  = Size;
+//         huart->RxXferCount = Size;
 
-        huart->ErrorCode = HAL_UART_ERROR_NONE;
-        huart->RxState   = HAL_UART_STATE_BUSY_RX;
+//         huart->ErrorCode = HAL_UART_ERROR_NONE;
+//         huart->RxState   = HAL_UART_STATE_BUSY_RX;
 
-        /* Process Unlocked */
-        //   __HAL_UNLOCK(huart);
+//         /* Process Unlocked */
+//         //   __HAL_UNLOCK(huart);
 
-        /* Enable the UART Parity Error Interrupt */
-        __HAL_UART_ENABLE_IT(huart, UART_IT_PE);
+//         /* Enable the UART Parity Error Interrupt */
+//         __HAL_UART_ENABLE_IT(huart, UART_IT_PE);
 
-        /* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */
-        __HAL_UART_ENABLE_IT(huart, UART_IT_ERR);
+//         /* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */
+//         __HAL_UART_ENABLE_IT(huart, UART_IT_ERR);
 
-        /* Enable the UART Data Register not empty Interrupt */
-        __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
+//         /* Enable the UART Data Register not empty Interrupt */
+//         __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
 
-        return HAL_OK;
-    } else {
-        return HAL_BUSY;
-    }
-}
+//         return HAL_OK;
+//     } else {
+//         return HAL_BUSY;
+//     }
+// }
 
 /**
  * @brief 这个函数需要在 HAL_UART_RxCpltCallback 中调用
@@ -194,7 +195,9 @@ static inline void wtrMavlink_UARTRxCpltCallback(UART_HandleTypeDef *huart, mavl
             if (mavlink_parse_char(chan, hMAVLink[chan].rx_buffer, &(hMAVLink[chan].msg), &(hMAVLink[chan].status))) {
                 wtrMavlink_MsgRxCpltCallback(&(hMAVLink[chan].msg));
             }
-            WTR_UART_Receive_IT(huart, &(hMAVLink[chan].rx_buffer), 1);
+            if (hMAVLink[chan].is_receiving) {
+                HAL_UART_Receive_IT(huart, &(hMAVLink[chan].rx_buffer), 1);
+            }
         }
     } else {
         // 如果卡在这里，说明 chan 超过了最大值

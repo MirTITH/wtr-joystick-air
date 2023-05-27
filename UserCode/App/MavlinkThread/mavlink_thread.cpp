@@ -21,6 +21,8 @@ void MavlinkThreadEntry(void *argument)
 
     Joystick::Point_t pos;
 
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);
+
     while (run_state_ == true) {
         for (size_t i = 0; i < 20; i++) {
             msg.buttons[i] = Buttons_Read(i + 1);
@@ -44,6 +46,8 @@ void MavlinkThreadEntry(void *argument)
         mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_0, &msg);
         vTaskDelay(20);
     }
+    // HAL_UART_AbortReceive_IT()
+
     task_handle_ = nullptr;
     vTaskDelete(nullptr);
 }
