@@ -100,7 +100,7 @@ static void mavlink_test_joystick_air_led(uint8_t system_id, uint8_t component_i
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
     mavlink_joystick_air_led_t packet_in = {
-        17.0,45.0,73.0,101.0
+        17.0,45.0,73.0,101.0,18067
     };
     mavlink_joystick_air_led_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -108,6 +108,7 @@ static void mavlink_test_joystick_air_led(uint8_t system_id, uint8_t component_i
         packet1.g = packet_in.g;
         packet1.b = packet_in.b;
         packet1.lightness = packet_in.lightness;
+        packet1.Duration = packet_in.Duration;
         
         
 #ifdef MAVLINK_STATUS_FLAG_OUT_MAVLINK1
@@ -122,12 +123,12 @@ static void mavlink_test_joystick_air_led(uint8_t system_id, uint8_t component_i
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
         memset(&packet2, 0, sizeof(packet2));
-    mavlink_msg_joystick_air_led_pack(system_id, component_id, &msg , packet1.r , packet1.g , packet1.b , packet1.lightness );
+    mavlink_msg_joystick_air_led_pack(system_id, component_id, &msg , packet1.r , packet1.g , packet1.b , packet1.lightness , packet1.Duration );
     mavlink_msg_joystick_air_led_decode(&msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
         memset(&packet2, 0, sizeof(packet2));
-    mavlink_msg_joystick_air_led_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.r , packet1.g , packet1.b , packet1.lightness );
+    mavlink_msg_joystick_air_led_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.r , packet1.g , packet1.b , packet1.lightness , packet1.Duration );
     mavlink_msg_joystick_air_led_decode(&msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 
@@ -140,7 +141,7 @@ static void mavlink_test_joystick_air_led(uint8_t system_id, uint8_t component_i
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
         
         memset(&packet2, 0, sizeof(packet2));
-    mavlink_msg_joystick_air_led_send(MAVLINK_COMM_1 , packet1.r , packet1.g , packet1.b , packet1.lightness );
+    mavlink_msg_joystick_air_led_send(MAVLINK_COMM_1 , packet1.r , packet1.g , packet1.b , packet1.lightness , packet1.Duration );
     mavlink_msg_joystick_air_led_decode(last_msg, &packet2);
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 

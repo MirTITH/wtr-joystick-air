@@ -9,15 +9,16 @@ typedef struct __mavlink_joystick_air_led_t {
  float g; /*<   range: [0, 1] */
  float b; /*<   range: [0, 1] */
  float lightness; /*<   Gain of lightness. Must be positive values */
+ uint16_t Duration; /*<   Led 灯亮多少毫秒 */
 } mavlink_joystick_air_led_t;
 
-#define MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN 16
-#define MAVLINK_MSG_ID_JOYSTICK_AIR_LED_MIN_LEN 16
-#define MAVLINK_MSG_ID_210_LEN 16
-#define MAVLINK_MSG_ID_210_MIN_LEN 16
+#define MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN 18
+#define MAVLINK_MSG_ID_JOYSTICK_AIR_LED_MIN_LEN 18
+#define MAVLINK_MSG_ID_210_LEN 18
+#define MAVLINK_MSG_ID_210_MIN_LEN 18
 
-#define MAVLINK_MSG_ID_JOYSTICK_AIR_LED_CRC 82
-#define MAVLINK_MSG_ID_210_CRC 82
+#define MAVLINK_MSG_ID_JOYSTICK_AIR_LED_CRC 64
+#define MAVLINK_MSG_ID_210_CRC 64
 
 
 
@@ -25,21 +26,23 @@ typedef struct __mavlink_joystick_air_led_t {
 #define MAVLINK_MESSAGE_INFO_JOYSTICK_AIR_LED { \
     210, \
     "JOYSTICK_AIR_LED", \
-    4, \
+    5, \
     {  { "r", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_joystick_air_led_t, r) }, \
          { "g", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_joystick_air_led_t, g) }, \
          { "b", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_joystick_air_led_t, b) }, \
          { "lightness", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_joystick_air_led_t, lightness) }, \
+         { "Duration", NULL, MAVLINK_TYPE_UINT16_T, 0, 16, offsetof(mavlink_joystick_air_led_t, Duration) }, \
          } \
 }
 #else
 #define MAVLINK_MESSAGE_INFO_JOYSTICK_AIR_LED { \
     "JOYSTICK_AIR_LED", \
-    4, \
+    5, \
     {  { "r", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_joystick_air_led_t, r) }, \
          { "g", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_joystick_air_led_t, g) }, \
          { "b", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_joystick_air_led_t, b) }, \
          { "lightness", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_joystick_air_led_t, lightness) }, \
+         { "Duration", NULL, MAVLINK_TYPE_UINT16_T, 0, 16, offsetof(mavlink_joystick_air_led_t, Duration) }, \
          } \
 }
 #endif
@@ -54,10 +57,11 @@ typedef struct __mavlink_joystick_air_led_t {
  * @param g   range: [0, 1] 
  * @param b   range: [0, 1] 
  * @param lightness   Gain of lightness. Must be positive values 
+ * @param Duration   Led 灯亮多少毫秒 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_joystick_air_led_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float r, float g, float b, float lightness)
+                               float r, float g, float b, float lightness, uint16_t Duration)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN];
@@ -65,6 +69,7 @@ static inline uint16_t mavlink_msg_joystick_air_led_pack(uint8_t system_id, uint
     _mav_put_float(buf, 4, g);
     _mav_put_float(buf, 8, b);
     _mav_put_float(buf, 12, lightness);
+    _mav_put_uint16_t(buf, 16, Duration);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN);
 #else
@@ -73,6 +78,7 @@ static inline uint16_t mavlink_msg_joystick_air_led_pack(uint8_t system_id, uint
     packet.g = g;
     packet.b = b;
     packet.lightness = lightness;
+    packet.Duration = Duration;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN);
 #endif
@@ -91,11 +97,12 @@ static inline uint16_t mavlink_msg_joystick_air_led_pack(uint8_t system_id, uint
  * @param g   range: [0, 1] 
  * @param b   range: [0, 1] 
  * @param lightness   Gain of lightness. Must be positive values 
+ * @param Duration   Led 灯亮多少毫秒 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_joystick_air_led_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
                                mavlink_message_t* msg,
-                                   float r,float g,float b,float lightness)
+                                   float r,float g,float b,float lightness,uint16_t Duration)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN];
@@ -103,6 +110,7 @@ static inline uint16_t mavlink_msg_joystick_air_led_pack_chan(uint8_t system_id,
     _mav_put_float(buf, 4, g);
     _mav_put_float(buf, 8, b);
     _mav_put_float(buf, 12, lightness);
+    _mav_put_uint16_t(buf, 16, Duration);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN);
 #else
@@ -111,6 +119,7 @@ static inline uint16_t mavlink_msg_joystick_air_led_pack_chan(uint8_t system_id,
     packet.g = g;
     packet.b = b;
     packet.lightness = lightness;
+    packet.Duration = Duration;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN);
 #endif
@@ -129,7 +138,7 @@ static inline uint16_t mavlink_msg_joystick_air_led_pack_chan(uint8_t system_id,
  */
 static inline uint16_t mavlink_msg_joystick_air_led_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_joystick_air_led_t* joystick_air_led)
 {
-    return mavlink_msg_joystick_air_led_pack(system_id, component_id, msg, joystick_air_led->r, joystick_air_led->g, joystick_air_led->b, joystick_air_led->lightness);
+    return mavlink_msg_joystick_air_led_pack(system_id, component_id, msg, joystick_air_led->r, joystick_air_led->g, joystick_air_led->b, joystick_air_led->lightness, joystick_air_led->Duration);
 }
 
 /**
@@ -143,7 +152,7 @@ static inline uint16_t mavlink_msg_joystick_air_led_encode(uint8_t system_id, ui
  */
 static inline uint16_t mavlink_msg_joystick_air_led_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_joystick_air_led_t* joystick_air_led)
 {
-    return mavlink_msg_joystick_air_led_pack_chan(system_id, component_id, chan, msg, joystick_air_led->r, joystick_air_led->g, joystick_air_led->b, joystick_air_led->lightness);
+    return mavlink_msg_joystick_air_led_pack_chan(system_id, component_id, chan, msg, joystick_air_led->r, joystick_air_led->g, joystick_air_led->b, joystick_air_led->lightness, joystick_air_led->Duration);
 }
 
 /**
@@ -154,10 +163,11 @@ static inline uint16_t mavlink_msg_joystick_air_led_encode_chan(uint8_t system_i
  * @param g   range: [0, 1] 
  * @param b   range: [0, 1] 
  * @param lightness   Gain of lightness. Must be positive values 
+ * @param Duration   Led 灯亮多少毫秒 
  */
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
-static inline void mavlink_msg_joystick_air_led_send(mavlink_channel_t chan, float r, float g, float b, float lightness)
+static inline void mavlink_msg_joystick_air_led_send(mavlink_channel_t chan, float r, float g, float b, float lightness, uint16_t Duration)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN];
@@ -165,6 +175,7 @@ static inline void mavlink_msg_joystick_air_led_send(mavlink_channel_t chan, flo
     _mav_put_float(buf, 4, g);
     _mav_put_float(buf, 8, b);
     _mav_put_float(buf, 12, lightness);
+    _mav_put_uint16_t(buf, 16, Duration);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR_LED, buf, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_CRC);
 #else
@@ -173,6 +184,7 @@ static inline void mavlink_msg_joystick_air_led_send(mavlink_channel_t chan, flo
     packet.g = g;
     packet.b = b;
     packet.lightness = lightness;
+    packet.Duration = Duration;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR_LED, (const char *)&packet, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_CRC);
 #endif
@@ -186,7 +198,7 @@ static inline void mavlink_msg_joystick_air_led_send(mavlink_channel_t chan, flo
 static inline void mavlink_msg_joystick_air_led_send_struct(mavlink_channel_t chan, const mavlink_joystick_air_led_t* joystick_air_led)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    mavlink_msg_joystick_air_led_send(chan, joystick_air_led->r, joystick_air_led->g, joystick_air_led->b, joystick_air_led->lightness);
+    mavlink_msg_joystick_air_led_send(chan, joystick_air_led->r, joystick_air_led->g, joystick_air_led->b, joystick_air_led->lightness, joystick_air_led->Duration);
 #else
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR_LED, (const char *)joystick_air_led, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_CRC);
 #endif
@@ -200,7 +212,7 @@ static inline void mavlink_msg_joystick_air_led_send_struct(mavlink_channel_t ch
   is usually the receive buffer for the channel, and allows a reply to an
   incoming message with minimum stack space usage.
  */
-static inline void mavlink_msg_joystick_air_led_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  float r, float g, float b, float lightness)
+static inline void mavlink_msg_joystick_air_led_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  float r, float g, float b, float lightness, uint16_t Duration)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char *buf = (char *)msgbuf;
@@ -208,6 +220,7 @@ static inline void mavlink_msg_joystick_air_led_send_buf(mavlink_message_t *msgb
     _mav_put_float(buf, 4, g);
     _mav_put_float(buf, 8, b);
     _mav_put_float(buf, 12, lightness);
+    _mav_put_uint16_t(buf, 16, Duration);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR_LED, buf, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_CRC);
 #else
@@ -216,6 +229,7 @@ static inline void mavlink_msg_joystick_air_led_send_buf(mavlink_message_t *msgb
     packet->g = g;
     packet->b = b;
     packet->lightness = lightness;
+    packet->Duration = Duration;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_JOYSTICK_AIR_LED, (const char *)packet, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_MIN_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_CRC);
 #endif
@@ -268,6 +282,16 @@ static inline float mavlink_msg_joystick_air_led_get_lightness(const mavlink_mes
 }
 
 /**
+ * @brief Get field Duration from joystick_air_led message
+ *
+ * @return   Led 灯亮多少毫秒 
+ */
+static inline uint16_t mavlink_msg_joystick_air_led_get_Duration(const mavlink_message_t* msg)
+{
+    return _MAV_RETURN_uint16_t(msg,  16);
+}
+
+/**
  * @brief Decode a joystick_air_led message into a struct
  *
  * @param msg The message to decode
@@ -280,6 +304,7 @@ static inline void mavlink_msg_joystick_air_led_decode(const mavlink_message_t* 
     joystick_air_led->g = mavlink_msg_joystick_air_led_get_g(msg);
     joystick_air_led->b = mavlink_msg_joystick_air_led_get_b(msg);
     joystick_air_led->lightness = mavlink_msg_joystick_air_led_get_lightness(msg);
+    joystick_air_led->Duration = mavlink_msg_joystick_air_led_get_Duration(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN? msg->len : MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN;
         memset(joystick_air_led, 0, MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN);

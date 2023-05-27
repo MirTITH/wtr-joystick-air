@@ -16,6 +16,7 @@
             <field type="float" name="g"> range: [0, 1] </field>
             <field type="float" name="b"> range: [0, 1] </field>
             <field type="float" name="lightness"> Gain of lightness. Must be positive values </field>
+            <field type="uint16_t" name="Duration"> Led 灯亮多少毫秒 </field>
         </message>
         <message id="211" name="JOYSTICK_AIR_DASHBOARD_NEW">
             <description>create a new dashboard</description>

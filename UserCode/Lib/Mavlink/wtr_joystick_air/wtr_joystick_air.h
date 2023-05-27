@@ -10,7 +10,7 @@
     #error Wrong include order: MAVLINK_WTR_JOYSTICK_AIR.H MUST NOT BE DIRECTLY USED. Include mavlink.h from the same directory instead or set ALL AND EVERY defines from MAVLINK.H manually accordingly, including the #define MAVLINK_H call.
 #endif
 
-#define MAVLINK_WTR_JOYSTICK_AIR_XML_HASH 6968688391501307316
+#define MAVLINK_WTR_JOYSTICK_AIR_XML_HASH 113146724405238735
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 #ifndef MAVLINK_MESSAGE_CRCS
-#define MAVLINK_MESSAGE_CRCS {{209, 237, 41, 41, 0, 0, 0}, {210, 82, 16, 16, 0, 0, 0}, {211, 39, 21, 21, 0, 0, 0}, {212, 22, 21, 21, 0, 0, 0}, {213, 36, 1, 1, 0, 0, 0}}
+#define MAVLINK_MESSAGE_CRCS {{209, 237, 41, 41, 0, 0, 0}, {210, 64, 18, 18, 0, 0, 0}, {211, 39, 21, 21, 0, 0, 0}, {212, 22, 21, 21, 0, 0, 0}, {213, 36, 1, 1, 0, 0, 0}}
 #endif
 
 #include "../protocol.h"
