@@ -9,7 +9,7 @@ typedef struct __mavlink_joystick_air_led_t {
  float g; /*<   range: [0, 1] */
  float b; /*<   range: [0, 1] */
  float lightness; /*<   Gain of lightness. Must be positive values */
- uint16_t Duration; /*<   Led ç¯äº®å¤šå°‘æ¯«ç§’ */
+ uint16_t Duration; /*<   Led µÆÁÁ¶àÉÙºÁÃë */
 } mavlink_joystick_air_led_t;
 
 #define MAVLINK_MSG_ID_JOYSTICK_AIR_LED_LEN 18
@@ -57,7 +57,7 @@ typedef struct __mavlink_joystick_air_led_t {
  * @param g   range: [0, 1] 
  * @param b   range: [0, 1] 
  * @param lightness   Gain of lightness. Must be positive values 
- * @param Duration   Led ç¯äº®å¤šå°‘æ¯«ç§’ 
+ * @param Duration   Led µÆÁÁ¶àÉÙºÁÃë 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_joystick_air_led_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
@@ -97,7 +97,7 @@ static inline uint16_t mavlink_msg_joystick_air_led_pack(uint8_t system_id, uint
  * @param g   range: [0, 1] 
  * @param b   range: [0, 1] 
  * @param lightness   Gain of lightness. Must be positive values 
- * @param Duration   Led ç¯äº®å¤šå°‘æ¯«ç§’ 
+ * @param Duration   Led µÆÁÁ¶àÉÙºÁÃë 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_joystick_air_led_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
@@ -163,7 +163,7 @@ static inline uint16_t mavlink_msg_joystick_air_led_encode_chan(uint8_t system_i
  * @param g   range: [0, 1] 
  * @param b   range: [0, 1] 
  * @param lightness   Gain of lightness. Must be positive values 
- * @param Duration   Led ç¯äº®å¤šå°‘æ¯«ç§’ 
+ * @param Duration   Led µÆÁÁ¶àÉÙºÁÃë 
  */
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
@@ -284,7 +284,7 @@ static inline float mavlink_msg_joystick_air_led_get_lightness(const mavlink_mes
 /**
  * @brief Get field Duration from joystick_air_led message
  *
- * @return   Led ç¯äº®å¤šå°‘æ¯«ç§’ 
+ * @return   Led µÆÁÁ¶àÉÙºÁÃë 
  */
 static inline uint16_t mavlink_msg_joystick_air_led_get_Duration(const mavlink_message_t* msg)
 {

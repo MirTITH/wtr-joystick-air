@@ -28,7 +28,7 @@ extern "C" {
 
 // 系统 ID 和 组件 ID
 static mavlink_system_t mavlink_system = {
-    1, // System ID (1-255)
+    200, // System ID (1-255)
     1  // Component ID (1-255)
 };
 
@@ -126,6 +126,8 @@ void wtrMavlink_BindChannel(UART_HandleTypeDef *huart, mavlink_channel_t chan);
  * @return 0：成功；-1：未绑定串口；HAL_BUSY：串口忙；HAL_ERROR：中断开启出错
  */
 int wtrMavlink_StartReceiveIT(mavlink_channel_t chan);
+
+void wtrMavlink_StopReceiveIT(mavlink_channel_t chan);
 
 /**
  * @brief 接收到完整消息且校验通过后会调用这个函数。在这个函数里调用解码函数就可以向结构体写入收到的数据

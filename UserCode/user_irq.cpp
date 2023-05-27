@@ -3,10 +3,17 @@
 #include "lvgl/lvgl.h"
 #include "adc.h"
 #include "Encoder/encoder_define.hpp"
+#include "Mavlink/wtr_mavlink.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    // 接收通道X的消息
+    wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);
+}
 
 // void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 // {

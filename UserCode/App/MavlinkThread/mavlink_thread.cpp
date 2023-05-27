@@ -46,7 +46,7 @@ void MavlinkThreadEntry(void *argument)
         mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_0, &msg);
         vTaskDelay(20);
     }
-    // HAL_UART_AbortReceive_IT()
+    wtrMavlink_StopReceiveIT(MAVLINK_COMM_0);
 
     task_handle_ = nullptr;
     vTaskDelete(nullptr);
@@ -79,4 +79,26 @@ void StopMavlinkThread()
     }
 
     xSemaphoreGive(mutex_);
+}
+
+/**
+ * @brief 接收到完整消息且校验通过后会调用这个函数。在这个函数里调用解码函数就可以向结构体写入收到的消息
+ *
+ * @param msg 接收到的消息
+ * @return
+ */
+void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
+{
+    switch (msg->msgid) {
+        case 1:
+            // id = 1 的消息对应的解码函数(mavlink_msg_xxx_decode)
+            // mavlink_msg__decode(msg, &StructReceived);
+            break;
+        case 2:
+            // id = 2 的消息对应的解码函数(mavlink_msg_xxx_decode)
+            break;
+        // ......
+        default:
+            break;
+    }
 }
