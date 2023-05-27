@@ -29,7 +29,7 @@ extern "C" {
 // 系统 ID 和 组件 ID
 static mavlink_system_t mavlink_system = {
     200, // System ID (1-255)
-    1  // Component ID (1-255)
+    1    // Component ID (1-255)
 };
 
 // MavLink 能使用的最大通道数
@@ -192,8 +192,10 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg);
  */
 static inline void wtrMavlink_UARTRxCpltCallback(UART_HandleTypeDef *huart, mavlink_channel_t chan)
 {
+    extern volatile uint32_t MavTotalBytesGot;
     if (chan < MAVLINK_COMM_NUM_BUFFERS) {
         if (huart == hMAVLink[chan].huart) {
+            MavTotalBytesGot++;
             if (mavlink_parse_char(chan, hMAVLink[chan].rx_buffer, &(hMAVLink[chan].msg), &(hMAVLink[chan].status))) {
                 wtrMavlink_MsgRxCpltCallback(&(hMAVLink[chan].msg));
             }

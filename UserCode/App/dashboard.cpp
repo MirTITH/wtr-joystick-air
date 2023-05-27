@@ -90,3 +90,5 @@ void Dashboard::SetMsg(double value)
     lv_label_set_text_static(msg_label_, msg_.c_str());
     LvglUnlock();
 }
+
+DashboardMgr dashboard_mgr("dashboard_mgr");

@@ -90,6 +90,7 @@ public:
 
     Dashboard *NewDashboard(uint8_t id, std::string title = "", std::string msg = "")
     {
+        LvglLock();
         auto iter = dashboards.find(id);
 
         if (iter != dashboards.end()) {
@@ -101,20 +102,24 @@ public:
         auto dashboard = new Dashboard(id);
         dashboard->Init(app_main_page, 200, title, msg);
         dashboards[id] = dashboard;
+        LvglUnlock();
         return dashboard;
     }
 
     Dashboard *GetDashboard(uint8_t id)
     {
+        LvglLock();
         auto iter = dashboards.find(id);
         if (iter != dashboards.end()) {
             return iter->second;
         }
+        LvglUnlock();
         return nullptr;
     }
 
     void DelDashboard(uint8_t id)
     {
+        LvglLock();
         auto iter = dashboards.find(id);
 
         if (iter != dashboards.end()) {
@@ -122,6 +127,7 @@ public:
             delete iter->second; // 删掉已经有的
             dashboards.erase(iter);
         }
+        LvglUnlock();
     }
 
     ~DashboardMgr()
@@ -131,3 +137,5 @@ public:
         }
     }
 };
+
+extern DashboardMgr dashboard_mgr;

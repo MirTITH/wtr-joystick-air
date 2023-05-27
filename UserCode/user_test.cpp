@@ -22,21 +22,15 @@
 
 using namespace std;
 
-DashboardMgr dashboard_mgr("dashboard_mgr");
-
 static TickType_t last_3_points_time = 0;
 
 void TestThreadEntry(void *argument)
 {
     (void)argument;
 
-    AppMgr_Init();
-    AppMgr_LaunchApp(InternalAs69Config, MainWindow, nullptr);
-    AppMgr_LaunchApp(dashboard_mgr, MainWindow, nullptr);
-    auto time_dashboard      = dashboard_mgr.NewDashboard(0, "Time");
-    auto encoder_dashboard   = dashboard_mgr.NewDashboard(1, "Encoder");
-    auto joystickl_dashboard = dashboard_mgr.NewDashboard(2, "JoystickL");
-    auto joystickr_dashboard = dashboard_mgr.NewDashboard(3, "JoystickR");
+    auto a_dashboard         = dashboard_mgr.NewDashboard(252, "TxRxBytes");
+    auto joystickl_dashboard = dashboard_mgr.NewDashboard(250, "JoystickL");
+    auto joystickr_dashboard = dashboard_mgr.NewDashboard(251, "JoystickR");
 
     stringstream sstr;
     sstr.precision(4);
@@ -44,17 +38,23 @@ void TestThreadEntry(void *argument)
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
+    extern volatile uint32_t MavTotalBytesSent;
+    extern volatile uint32_t MavTotalBytesGot;
+
     while (true) {
-        time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
+        // time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
+        sstr.str("");
+        sstr << MavTotalBytesSent << "," << MavTotalBytesGot;
+        a_dashboard->SetMsg(sstr.str());
         sstr.str("");
         sstr << JoystickL.Pos().x << "," << JoystickL.Pos().y;
         joystickl_dashboard->SetMsg(sstr.str());
         sstr.str("");
         sstr << JoystickR.Pos().x << "," << JoystickR.Pos().y;
         joystickr_dashboard->SetMsg(sstr.str());
-        sstr.str("");
-        sstr << KnobEncoderR.Count() << "," << KnobEncoderL.Count();
-        encoder_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // sstr << KnobEncoderR.Count() << "," << KnobEncoderL.Count();
+        // encoder_dashboard->SetMsg(sstr.str());
 
         if (TouchScreen.NumberOfTouchPoint() == 3) {
             if (xTaskGetTickCount() - last_3_points_time > 500) {
@@ -63,6 +63,6 @@ void TestThreadEntry(void *argument)
             last_3_points_time = xTaskGetTickCount();
         }
 
-        vTaskDelayUntil(&PreviousWakeTime, 50);
+        vTaskDelayUntil(&PreviousWakeTime, 100);
     }
 }

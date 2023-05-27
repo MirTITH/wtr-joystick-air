@@ -12,6 +12,7 @@
 #include "wtr_mavlink.h"
 
 volatile uint32_t MavTotalBytesSent = 0;
+volatile uint32_t MavTotalBytesGot = 0;
 
 wtrMavlink_handle_t hMAVLink[MAVLINK_COMM_NUM_BUFFERS] = {0};
 

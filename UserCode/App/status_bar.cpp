@@ -19,9 +19,11 @@ static void StatusBar_Entry(void *argument)
     float voltage_threshold_l = 6.3;
     float voltage_threshold_h = 6.5;
     extern volatile uint32_t MavTotalBytesSent;
+    extern volatile uint32_t MavTotalBytesGot;
     uint32_t last_mav_bytes_sent = MavTotalBytesSent;
+    uint32_t last_mav_bytes_got  = MavTotalBytesGot;
     TickType_t last_tick         = xTaskGetTickCount();
-    float mav_send_speed;
+    float mav_send_speed, mav_rcv_speed;
 
     while (1) {
         auto voltage = Batt.GetVoltage();
@@ -36,16 +38,20 @@ static void StatusBar_Entry(void *argument)
         }
 
         mav_send_speed      = (MavTotalBytesSent - last_mav_bytes_sent) / 1.024f / (xTaskGetTickCount() - last_tick);
+        mav_rcv_speed       = (MavTotalBytesGot - last_mav_bytes_got) / 1.024f / (xTaskGetTickCount() - last_tick);
         last_tick           = xTaskGetTickCount();
         last_mav_bytes_sent = MavTotalBytesSent;
+        last_mav_bytes_got  = MavTotalBytesGot;
 
+        LvglLock();
         if (is_volt_red) {
-            lv_label_set_text_fmt(status_bar_label, "#ff0000 Volt: %.2f#  Temper: %.1f  Up: %.2f KB", voltage, GetCoreTemperature(), mav_send_speed);
+            lv_label_set_text_fmt(status_bar_label, "#ff0000 " LV_SYMBOL_BATTERY_EMPTY " %.2fV# Temp %.1f " LV_SYMBOL_UPLOAD " %.2fKB/s " LV_SYMBOL_DOWNLOAD " %.2fKB/s", voltage, GetCoreTemperature(), mav_send_speed, mav_rcv_speed);
         } else {
-            lv_label_set_text_fmt(status_bar_label, "Volt: %.2f  Temper: %.1f  Up: %.2f KB", voltage, GetCoreTemperature(), mav_send_speed);
+            lv_label_set_text_fmt(status_bar_label, LV_SYMBOL_BATTERY_FULL " %.2fV Temp %.1f " LV_SYMBOL_UPLOAD " %.2fKB/s " LV_SYMBOL_DOWNLOAD " %.2fKB/s", voltage, GetCoreTemperature(), mav_send_speed, mav_rcv_speed);
         }
+        LvglUnlock();
 
-        vTaskDelay(1000);
+        vTaskDelay(500);
     }
 }
 

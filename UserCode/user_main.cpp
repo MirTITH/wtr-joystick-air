@@ -15,6 +15,9 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "As69/as69_device.hpp"
+#include "App/dashboard.hpp"
+#include "LvglApp/app_mgr.hpp"
+#include "as69_config.hpp"
 
 void StartDefaultTask(void const *argument)
 {
@@ -36,6 +39,11 @@ void StartDefaultTask(void const *argument)
     StartLvglThread();
     InternalAs69.Init();
     InitMavlinkThread();
+
+    AppMgr_Init();
+    AppMgr_LaunchApp(InternalAs69Config, MainWindow, nullptr);
+    AppMgr_LaunchApp(dashboard_mgr, MainWindow, nullptr);
+
     xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 3, nullptr);
     StartMavlinkThread();
     vTaskDelete(nullptr);
