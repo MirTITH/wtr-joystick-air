@@ -63,7 +63,7 @@ void Dashboard::Init(lv_obj_t *parent, lv_coord_t size_w, std::string title, std
 
     // lv_obj_set_width(msg_label_, lv_pct(100));
     // lv_obj_align(msg_label_, LV_ALIGN_BOTTOM_RIGHT, -5, -5);
-    lv_label_set_long_mode(msg_label_, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_long_mode(msg_label_, LV_LABEL_LONG_SCROLL);
 
     LvglUnlock();
 
@@ -75,17 +75,6 @@ void Dashboard::SetMsg(const std::string &msg)
 {
     LvglLock();
     msg_ = msg;
-    StepArc();
-    lv_label_set_text_static(msg_label_, msg_.c_str());
-    LvglUnlock();
-}
-
-void Dashboard::SetMsg(double value)
-{
-    // std::stringstream sstr;
-    // sstr << value;
-    LvglLock();
-    msg_ = std::to_string(value);
     StepArc();
     lv_label_set_text_static(msg_label_, msg_.c_str());
     LvglUnlock();

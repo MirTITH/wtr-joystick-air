@@ -29,15 +29,15 @@ void TestThreadEntry(void *argument)
 {
     (void)argument;
 
-    auto joystickl_dashboard = dashboard_mgr.NewDashboard(250, "JoystickL");
-    auto joystickr_dashboard = dashboard_mgr.NewDashboard(251, "JoystickR");
-    auto encoder_dashboard   = dashboard_mgr.NewDashboard(252, "Encoder");
-    auto button_dashboard    = dashboard_mgr.NewDashboard(253, "Buttons(0-10 bit)");
-    auto button2_dashboard   = dashboard_mgr.NewDashboard(254, "Buttons(11-21 bit)");
+    // auto joystickl_dashboard = dashboard_mgr.NewDashboard(250, "JoystickL");
+    // auto joystickr_dashboard = dashboard_mgr.NewDashboard(251, "JoystickR");
+    // auto encoder_dashboard   = dashboard_mgr.NewDashboard(252, "Encoder");
+    // auto button_dashboard    = dashboard_mgr.NewDashboard(253, "Buttons(0-10 bit)");
+    // auto button2_dashboard   = dashboard_mgr.NewDashboard(254, "Buttons(11-21 bit)");
 
-    stringstream sstr;
-    sstr.precision(4);
-    sstr.setf(std::ios::fixed);
+    // stringstream sstr;
+    // sstr.precision(4);
+    // sstr.setf(std::ios::fixed);
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
@@ -46,27 +46,27 @@ void TestThreadEntry(void *argument)
 
     while (true) {
         // time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
-        sstr.str("");
-        sstr << JoystickL.Pos().x << "," << JoystickL.Pos().y;
-        joystickl_dashboard->SetMsg(sstr.str());
-        sstr.str("");
-        sstr << JoystickR.Pos().x << "," << JoystickR.Pos().y;
-        joystickr_dashboard->SetMsg(sstr.str());
-        sstr.str("");
-        sstr << KnobEncoderL.Count() << "," << KnobEncoderR.Count();
-        encoder_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // sstr << JoystickL.Pos().x << "," << JoystickL.Pos().y;
+        // joystickl_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // sstr << JoystickR.Pos().x << "," << JoystickR.Pos().y;
+        // joystickr_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // sstr << KnobEncoderL.Count() << "," << KnobEncoderR.Count();
+        // encoder_dashboard->SetMsg(sstr.str());
 
-        sstr.str("");
-        for (size_t i = 1; i <= 11; i++) {
-            sstr << (int)Buttons_Read(i);
-        }
-        button_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // for (size_t i = 1; i <= 11; i++) {
+        //     sstr << (int)Buttons_Read(i);
+        // }
+        // button_dashboard->SetMsg(sstr.str());
 
-        sstr.str("");
-        for (size_t i = 12; i <= 22; i++) {
-            sstr << (int)Buttons_Read(i);
-        }
-        button2_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // for (size_t i = 12; i <= 22; i++) {
+        //     sstr << (int)Buttons_Read(i);
+        // }
+        // button2_dashboard->SetMsg(sstr.str());
 
         if (TouchScreen.NumberOfTouchPoint() == 3) {
             if (xTaskGetTickCount() - last_3_points_time > 500) {

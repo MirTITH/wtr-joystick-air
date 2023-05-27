@@ -20,7 +20,7 @@ public:
         double value = 0;
         while (true) {
             value += 0.1;
-            dashboard->SetMsg(value);
+            dashboard->SetMsgValue(value);
             vTaskDelay(100);
         }
     }

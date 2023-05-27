@@ -22,7 +22,26 @@ public:
 
     void SetMsg(const std::string &msg);
 
-    void SetMsg(double value);
+    template <typename T>
+    void SetMsgValue(T value)
+    {
+        LvglLock();
+        msg_ = std::to_string(value);
+        StepArc();
+        lv_label_set_text_static(msg_label_, msg_.c_str());
+        LvglUnlock();
+    }
+
+    template <typename T1, typename T2>
+    void SetMsgValue(T1 value1, T2 value2)
+    {
+        LvglLock();
+        msg_ = std::to_string(value1);
+        msg_.append(",").append(std::to_string(value2));
+        StepArc();
+        lv_label_set_text_static(msg_label_, msg_.c_str());
+        LvglUnlock();
+    }
 
     std::string GetMsg() const
     {

@@ -73,7 +73,11 @@
             "ratio": "cpp",
             "iomanip": "cpp",
             "strstream": "cpp",
-            "map": "cpp"
+            "map": "cpp",
+            "condition_variable": "cpp",
+            "mutex": "cpp",
+            "stop_token": "cpp",
+            "thread": "cpp"
         },
         "[yaml]": {
             "editor.insertSpaces": true,
