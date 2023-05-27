@@ -139,10 +139,10 @@ static void ProcessMsgJoystickAir()
         dashboard = dashboard_mgr.GetDashboard(253);
         if (dashboard == nullptr) {
             // 如果不存在就创建一个
-            dashboard = dashboard_mgr.NewDashboard(253, "Btn bit[0,10]");
+            dashboard = dashboard_mgr.NewDashboard(253, "Btn");
         }
         stringstream sstr;
-        for (size_t i = 0; i <= 10; i++) {
+        for (size_t i = 0; i <= 19; i++) {
             sstr << ((msg.buttons >> i) & 1);
         }
         dashboard->SetMsg(sstr.str());
@@ -150,12 +150,12 @@ static void ProcessMsgJoystickAir()
         dashboard = dashboard_mgr.GetDashboard(254);
         if (dashboard == nullptr) {
             // 如果不存在就创建一个
-            dashboard = dashboard_mgr.NewDashboard(254, "Btn bit[11,21]");
+            dashboard = dashboard_mgr.NewDashboard(254, "Switchs");
         }
 
         sstr.str("");
-        for (size_t i = 11; i <= 21; i++) {
-            sstr << ((msg.buttons >> i) & 1);
+        for (size_t i = 0; i <= 1; i++) {
+            sstr << ((msg.switchs >> i) & 1);
         }
         dashboard->SetMsg(sstr.str());
     }
