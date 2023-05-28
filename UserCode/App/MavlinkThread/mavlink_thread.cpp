@@ -79,9 +79,10 @@ static void ProcessLed()
 static void ProcessDashboard()
 {
     if (got_msg_dashboard_set_msg_) {
-        got_msg_dashboard_set_msg_ = false;
-        auto &msg                  = msg_dashboard_set_msg_;
-        auto dashboard             = dashboard_mgr.GetDashboard(msg.id);
+        got_msg_dashboard_set_msg_           = false;
+        auto &msg                            = msg_dashboard_set_msg_;
+        msg.message[sizeof(msg.message) - 1] = '\0'; // 字符串安全
+        auto dashboard                       = dashboard_mgr.GetDashboard(msg.id);
         if (dashboard == nullptr) {
             // 如果不存在就创建一个
             dashboard = dashboard_mgr.NewDashboard(msg.id, "", msg.message);
@@ -91,9 +92,10 @@ static void ProcessDashboard()
     }
 
     if (got_msg_dashboard_set_title_) {
-        got_msg_dashboard_set_title_ = false;
-        auto &msg                    = msg_dashboard_set_title_;
-        auto dashboard               = dashboard_mgr.GetDashboard(msg.id);
+        got_msg_dashboard_set_title_     = false;
+        auto &msg                        = msg_dashboard_set_title_;
+        msg.title[sizeof(msg.title) - 1] = '\0'; // 字符串安全
+        auto dashboard                   = dashboard_mgr.GetDashboard(msg.id);
         if (dashboard == nullptr) {
             // 如果不存在就创建一个
             dashboard = dashboard_mgr.NewDashboard(msg.id, msg.title);
