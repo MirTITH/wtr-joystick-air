@@ -1,16 +1,24 @@
 # WTR Joystick Air
 
+带有屏幕的自制无线手柄
+
+![遥控器照片](Docs/joystick_photo.jpg)
+
+暂时没有写它的文档，以下文字是工程模板说明，和遥控器无关
+
 ## EIDE 工程说明
+
 ### 目录结构
 
 - CubeMX: 用于存放 CubeMX 的 ioc 文件和 CubeMX 生成的所有文件
 - UserCode: 用于存放用户代码文件
 - .eide: EIDE 相关的配置文件
-    - debug.files.options.yml: 可以给不同的文件指定不同的编译选项
+  - debug.files.options.yml: 可以给不同的文件指定不同的编译选项
 
 ### 编译器选项说明
 
 #### -Wextra
+
 开启额外的 warning，这样会打印更多的 warning，更容易找到 bug
 
 #### 选项：One ELF Section per Function 和 One ELF Section per Data
@@ -28,6 +36,7 @@
 -pipe 选项告诉 GCC 使用管道而不是临时文件来在编译的各个阶段之间进行通信。这可以加快编译速度，特别是在 I/O 较慢的系统上。
 
 #### -fno-rtti
+
 -fno-rtti 选项告诉 GCC 不要生成与运行时类型信息有关的代码。这可以减小程序的大小并提高编译速度，但是会使得程序无法使用 RTTI（Run-Time Type Identification）功能。
 
 ### 链接器选项说明
@@ -68,11 +77,12 @@
 
 使用 `-lLibraryName` 链接名称为 `LibraryName` 的库。
 
+如：`-lm -lstdc++`
+
 - m：数学库，提供了 math.h 中的各种数学函数。（有时候编译器会默认帮你链接这个库）
 - stdc++: C++ 库，提供了许多 C++ 中的函数。
 
 > 编译时使用 `gcc` 命令会默认链接 C 库，不会链接 C++ 库；  
-> 编译时使用 `g++` 命令会默认链接 C++ 库，不会链接 C 库；  
+> 编译时使用 `g++` 命令会默认链接 C++ 库；  
 > 所以通常情况下使用 `gcc` 编译 .c 文件，使用 `g++` 编译 .cpp 文件  
 > 但 EIDE 编译 .cpp 文件时也使用 `gcc` 命令，所以必须指定要链接 C++ 库
-
