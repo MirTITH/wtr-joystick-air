@@ -84,7 +84,8 @@
             "editor.tabSize": 4,
             "editor.autoIndent": "advanced"
         },
-        "cortex-debug.variableUseNaturalFormat": true
+        "cortex-debug.variableUseNaturalFormat": true,
+        "ros.distro": "noetic"
     },
     "extensions": {
         "recommendations": [
