@@ -1,6 +1,6 @@
 #include "HighPrecisionTime/high_precision_time.h"
 
-unsigned long RunTimeStatusStartUs = 0;
+static unsigned long RunTimeStatusStartUs = 0;
 
 void configureTimerForRunTimeStats(void)
 {
