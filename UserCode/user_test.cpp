@@ -17,7 +17,6 @@
 #include "as69_config.hpp"
 #include "TouchScreen/GT911/gt911_define.hpp"
 #include "Button/buttons.h"
-#include "mpu9250/example/driver_mpu9250_dmp.h"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -71,22 +70,19 @@ void TestThreadEntry(void *argument)
     // auto encoder_dashboard   = dashboard_mgr.NewDashboard(252, "Encoder");
     // auto button_dashboard    = dashboard_mgr.NewDashboard(253, "Buttons(0-10 bit)");
     // auto button2_dashboard   = dashboard_mgr.NewDashboard(254, "Buttons(11-21 bit)");
-    auto mpu_result_dashboard = dashboard_mgr.NewDashboard(100, "MPU9250 result");
+    // auto mpu_result_dashboard = dashboard_mgr.NewDashboard(100, "MPU9250 result");
     // auto mpu_g_dashboard      = dashboard_mgr.NewDashboard(101, "MPU9250 g");
     // auto mpu_dps_dashboard    = dashboard_mgr.NewDashboard(102, "MPU9250 dps");
     // auto mpu_ut_dashboard     = dashboard_mgr.NewDashboard(103, "MPU9250 ut");
     // auto mpu_temp_dashboard   = dashboard_mgr.NewDashboard(104, "MPU9250 temp");
-    auto mpu_pitch_dashboard = dashboard_mgr.NewDashboard(105, "MPU9250 pitch");
-    auto mpu_roll_dashboard  = dashboard_mgr.NewDashboard(106, "MPU9250 roll");
-    auto mpu_yaw_dashboard   = dashboard_mgr.NewDashboard(107, "MPU9250 yaw");
+    // auto mpu_pitch_dashboard = dashboard_mgr.NewDashboard(105, "MPU9250 pitch");
+    // auto mpu_roll_dashboard  = dashboard_mgr.NewDashboard(106, "MPU9250 roll");
+    // auto mpu_yaw_dashboard   = dashboard_mgr.NewDashboard(107, "MPU9250 yaw");
 
     stringstream sstr;
     sstr.precision(2);
     sstr.setf(std::ios::fixed);
 
-    // int mpu_result = mpu9250_basic_init(MPU9250_INTERFACE_IIC, MPU9250_ADDRESS_AD0_LOW);
-    int mpu_result = mpu9250_dmp_init(MPU9250_INTERFACE_IIC, MPU9250_ADDRESS_AD0_LOW,
-                                      a_receive_callback, nullptr, nullptr);
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
@@ -98,38 +94,9 @@ void TestThreadEntry(void *argument)
     // float ut[3]{};
     // float temperature = 0;
 
-    static int16_t gs_accel_raw[128][3];
-    static float gs_accel_g[128][3];
-    static int16_t gs_gyro_raw[128][3];
-    static float gs_gyro_dps[128][3];
-    static int32_t gs_quat[128][4];
-    static float gs_pitch[128];
-    static float gs_roll[128];
-    static float gs_yaw[128];
-    uint16_t len;
-
     while (true) {
         // time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
         // Buttons_Scan();
-        // mpu_result_dashboard->SetMsgValue(mpu_result);
-        // // mpu9250_basic_read(g, dps, ut);
-        len = 128;
-        mpu9250_dmp_read_all(gs_accel_raw, gs_accel_g,
-                             gs_gyro_raw, gs_gyro_dps,
-                             gs_quat,
-                             gs_pitch, gs_roll, gs_yaw,
-                             &len);
-
-        mpu9250_interface_debug_print("fifo %d.\n", len);
-        mpu9250_interface_debug_print("pitch[0] is %0.2fdps.\n", gs_pitch[0]);
-        mpu9250_interface_debug_print("roll[0] is %0.2fdps.\n", gs_roll[0]);
-        mpu9250_interface_debug_print("yaw[0] is %0.2fdps.\n", gs_yaw[0]);
-        mpu9250_interface_debug_print("acc x[0] is %0.2fg.\n", gs_accel_g[0][0]);
-        mpu9250_interface_debug_print("acc y[0] is %0.2fg.\n", gs_accel_g[0][1]);
-        mpu9250_interface_debug_print("acc z[0] is %0.2fg.\n", gs_accel_g[0][2]);
-        mpu9250_interface_debug_print("gyro x[0] is %0.2fdps.\n", gs_gyro_dps[0][0]);
-        mpu9250_interface_debug_print("gyro y[0] is %0.2fdps.\n", gs_gyro_dps[0][1]);
-        mpu9250_interface_debug_print("gyro z[0] is %0.2fdps.\n", gs_gyro_dps[0][2]);
 
         // mpu_pitch_dashboard->SetMsgValue(gs_pitch[0]);
         // mpu_roll_dashboard->SetMsgValue(gs_roll[0]);
