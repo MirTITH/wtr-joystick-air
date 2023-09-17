@@ -4,6 +4,7 @@
 #include "adc.h"
 #include "Encoder/encoder_define.hpp"
 #include "Mavlink/wtr_mavlink.h"
+#include "freertos_io/uart_device.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +14,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     // 接收通道X的消息
     wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == MainUart.uart_device.huart_.Instance) {
+        MainUart.uart_device.TxCpltCallback();
+    }
 }
 
 // void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)

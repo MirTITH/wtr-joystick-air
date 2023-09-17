@@ -37,11 +37,11 @@ void StartDefaultTask(void const *argument)
     lv_port_disp_init();
     lv_port_indev_init();
     StartLvglThread();
-    // InternalAs69.Init();
+    InternalAs69.Init();
     // InitMavlinkThread();
 
     AppMgr_Init();
-    // AppMgr_LaunchApp(InternalAs69Config, MainWindow, nullptr);
+    AppMgr_LaunchApp(InternalAs69Config, MainWindow, nullptr);
     AppMgr_LaunchApp(dashboard_mgr, MainWindow, nullptr);
 
     xTaskCreate(TestThreadEntry, "TestThread", 2048, nullptr, 3, nullptr);

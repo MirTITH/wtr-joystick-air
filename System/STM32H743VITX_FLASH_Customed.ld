@@ -84,7 +84,7 @@ SECTIONS
     *(.itcmram*)
     /* 路径里有 UserCode 的文件中的代码段 */
     /* lvgl 太大了，放不下 */
-    EXCLUDE_FILE (*UserCode/Lib/lvgl*.o) *UserCode*.o(.text*)
+    /* EXCLUDE_FILE (*UserCode/Lib/lvgl*.o) *UserCode*.o(.text*) */
 
     . = ALIGN(4);
     _edata_itcm = .;

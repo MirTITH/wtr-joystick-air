@@ -76,9 +76,9 @@ void TestThreadEntry(void *argument)
     // auto mpu_dps_dashboard    = dashboard_mgr.NewDashboard(102, "MPU9250 dps");
     // auto mpu_ut_dashboard     = dashboard_mgr.NewDashboard(103, "MPU9250 ut");
     // auto mpu_temp_dashboard   = dashboard_mgr.NewDashboard(104, "MPU9250 temp");
-    auto mpu_pitch_dashboard  = dashboard_mgr.NewDashboard(105, "MPU9250 pitch");
-    auto mpu_roll_dashboard   = dashboard_mgr.NewDashboard(106, "MPU9250 roll");
-    auto mpu_yaw_dashboard    = dashboard_mgr.NewDashboard(107, "MPU9250 yaw");
+    auto mpu_pitch_dashboard = dashboard_mgr.NewDashboard(105, "MPU9250 pitch");
+    auto mpu_roll_dashboard  = dashboard_mgr.NewDashboard(106, "MPU9250 roll");
+    auto mpu_yaw_dashboard   = dashboard_mgr.NewDashboard(107, "MPU9250 yaw");
 
     stringstream sstr;
     sstr.precision(2);
@@ -109,20 +109,21 @@ void TestThreadEntry(void *argument)
     uint16_t len;
 
     while (true) {
+        printf("Hello\n");
         // time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
         // Buttons_Scan();
-        mpu_result_dashboard->SetMsgValue(mpu_result);
-        // mpu9250_basic_read(g, dps, ut);
-        len = 128;
-        mpu9250_dmp_read_all(gs_accel_raw, gs_accel_g,
-                             gs_gyro_raw, gs_gyro_dps,
-                             gs_quat,
-                             gs_pitch, gs_roll, gs_yaw,
-                             &len);
+        // mpu_result_dashboard->SetMsgValue(mpu_result);
+        // // mpu9250_basic_read(g, dps, ut);
+        // len = 128;
+        // mpu9250_dmp_read_all(gs_accel_raw, gs_accel_g,
+        //                      gs_gyro_raw, gs_gyro_dps,
+        //                      gs_quat,
+        //                      gs_pitch, gs_roll, gs_yaw,
+        //                      &len);
 
-        mpu_pitch_dashboard->SetMsgValue(gs_pitch[0]);
-        mpu_roll_dashboard->SetMsgValue(gs_roll[0]);
-        mpu_yaw_dashboard->SetMsgValue(gs_yaw[0]);
+        // mpu_pitch_dashboard->SetMsgValue(gs_pitch[0]);
+        // mpu_roll_dashboard->SetMsgValue(gs_roll[0]);
+        // mpu_yaw_dashboard->SetMsgValue(gs_yaw[0]);
 
         // sstr.str("");
         // sstr << gs_accel_g[0] << "," << gs_accel_g[1] << "," << gs_accel_g[2];
