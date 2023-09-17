@@ -17,7 +17,7 @@
 #include "as69_config.hpp"
 #include "TouchScreen/GT911/gt911_define.hpp"
 #include "Button/buttons.h"
-#include "mpu9250/example/driver_mpu9250_basic.h"
+#include "mpu9250/example/driver_mpu9250_dmp.h"
 
 #define Led_Pin  GPIO_PIN_1
 #define Led_Port GPIOA
@@ -25,6 +25,42 @@
 using namespace std;
 
 // static TickType_t last_3_points_time = 0;
+
+static void a_receive_callback(uint8_t type)
+{
+    switch (type) {
+        case MPU9250_INTERRUPT_MOTION: {
+            mpu9250_interface_debug_print("mpu9250: irq motion.\n");
+
+            break;
+        }
+        case MPU9250_INTERRUPT_FIFO_OVERFLOW: {
+            mpu9250_interface_debug_print("mpu9250: irq fifo overflow.\n");
+
+            break;
+        }
+        case MPU9250_INTERRUPT_FSYNC_INT: {
+            mpu9250_interface_debug_print("mpu9250: irq fsync int.\n");
+
+            break;
+        }
+        case MPU9250_INTERRUPT_DMP: {
+            mpu9250_interface_debug_print("mpu9250: irq dmp\n");
+
+            break;
+        }
+        case MPU9250_INTERRUPT_DATA_READY: {
+            mpu9250_interface_debug_print("mpu9250: irq data ready\n");
+
+            break;
+        }
+        default: {
+            mpu9250_interface_debug_print("mpu9250: irq unknown code.\n");
+
+            break;
+        }
+    }
+}
 
 void TestThreadEntry(void *argument)
 {
@@ -36,47 +72,72 @@ void TestThreadEntry(void *argument)
     // auto button_dashboard    = dashboard_mgr.NewDashboard(253, "Buttons(0-10 bit)");
     // auto button2_dashboard   = dashboard_mgr.NewDashboard(254, "Buttons(11-21 bit)");
     auto mpu_result_dashboard = dashboard_mgr.NewDashboard(100, "MPU9250 result");
-    auto mpu_g_dashboard      = dashboard_mgr.NewDashboard(101, "MPU9250 g");
-    auto mpu_dps_dashboard    = dashboard_mgr.NewDashboard(102, "MPU9250 dps");
-    auto mpu_ut_dashboard     = dashboard_mgr.NewDashboard(103, "MPU9250 ut");
-    auto mpu_temp_dashboard   = dashboard_mgr.NewDashboard(104, "MPU9250 temp");
+    // auto mpu_g_dashboard      = dashboard_mgr.NewDashboard(101, "MPU9250 g");
+    // auto mpu_dps_dashboard    = dashboard_mgr.NewDashboard(102, "MPU9250 dps");
+    // auto mpu_ut_dashboard     = dashboard_mgr.NewDashboard(103, "MPU9250 ut");
+    // auto mpu_temp_dashboard   = dashboard_mgr.NewDashboard(104, "MPU9250 temp");
+    auto mpu_pitch_dashboard  = dashboard_mgr.NewDashboard(105, "MPU9250 pitch");
+    auto mpu_roll_dashboard   = dashboard_mgr.NewDashboard(106, "MPU9250 roll");
+    auto mpu_yaw_dashboard    = dashboard_mgr.NewDashboard(107, "MPU9250 yaw");
 
     stringstream sstr;
     sstr.precision(2);
     sstr.setf(std::ios::fixed);
 
-    int mpu_result = mpu9250_basic_init(MPU9250_INTERFACE_IIC, MPU9250_ADDRESS_AD0_LOW);
+    // int mpu_result = mpu9250_basic_init(MPU9250_INTERFACE_IIC, MPU9250_ADDRESS_AD0_LOW);
+    int mpu_result = mpu9250_dmp_init(MPU9250_INTERFACE_IIC, MPU9250_ADDRESS_AD0_LOW,
+                                      a_receive_callback, nullptr, nullptr);
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
     // extern volatile uint32_t MavTotalBytesSent;
     // extern volatile uint32_t MavTotalBytesGot;
 
-    float g[3]{};
-    float dps[3]{};
-    float ut[3]{};
-    float temperature = 0;
+    // float g[3]{};
+    // float dps[3]{};
+    // float ut[3]{};
+    // float temperature = 0;
+
+    static int16_t gs_accel_raw[128][3];
+    static float gs_accel_g[128][3];
+    static int16_t gs_gyro_raw[128][3];
+    static float gs_gyro_dps[128][3];
+    static int32_t gs_quat[128][4];
+    static float gs_pitch[128];
+    static float gs_roll[128];
+    static float gs_yaw[128];
+    uint16_t len;
 
     while (true) {
         // time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
         // Buttons_Scan();
         mpu_result_dashboard->SetMsgValue(mpu_result);
-        mpu9250_basic_read(g, dps, ut);
+        // mpu9250_basic_read(g, dps, ut);
+        len = 128;
+        mpu9250_dmp_read_all(gs_accel_raw, gs_accel_g,
+                             gs_gyro_raw, gs_gyro_dps,
+                             gs_quat,
+                             gs_pitch, gs_roll, gs_yaw,
+                             &len);
 
-        sstr.str("");
-        sstr << g[0] << "," << g[1] << "," << g[2];
-        mpu_g_dashboard->SetMsg(sstr.str());
+        mpu_pitch_dashboard->SetMsgValue(gs_pitch[0]);
+        mpu_roll_dashboard->SetMsgValue(gs_roll[0]);
+        mpu_yaw_dashboard->SetMsgValue(gs_yaw[0]);
 
-        sstr.str("");
-        sstr << dps[0] << "," << dps[1] << "," << dps[2];
-        mpu_dps_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // sstr << gs_accel_g[0] << "," << gs_accel_g[1] << "," << gs_accel_g[2];
+        // mpu_g_dashboard->SetMsg(sstr.str());
 
-        sstr.str("");
-        sstr << ut[0] << "," << ut[1] << "," << ut[2];
-        mpu_ut_dashboard->SetMsg(sstr.str());
+        // sstr.str("");
+        // sstr << dps[0] << "," << dps[1] << "," << dps[2];
+        // mpu_dps_dashboard->SetMsg(sstr.str());
 
-        mpu9250_basic_read_temperature(&temperature);
-        mpu_temp_dashboard->SetMsgValue(temperature);
+        // sstr.str("");
+        // sstr << ut[0] << "," << ut[1] << "," << ut[2];
+        // mpu_ut_dashboard->SetMsg(sstr.str());
+
+        // mpu9250_basic_read_temperature(&temperature);
+        // mpu_temp_dashboard->SetMsgValue(temperature);
 
         // sstr << JoystickL.Pos().x << "," << JoystickL.Pos().y;
         // joystickl_dashboard->SetMsg(sstr.str());
