@@ -109,17 +109,27 @@ void TestThreadEntry(void *argument)
     uint16_t len;
 
     while (true) {
-        printf("Hello\n");
         // time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
         // Buttons_Scan();
         // mpu_result_dashboard->SetMsgValue(mpu_result);
         // // mpu9250_basic_read(g, dps, ut);
-        // len = 128;
-        // mpu9250_dmp_read_all(gs_accel_raw, gs_accel_g,
-        //                      gs_gyro_raw, gs_gyro_dps,
-        //                      gs_quat,
-        //                      gs_pitch, gs_roll, gs_yaw,
-        //                      &len);
+        len = 128;
+        mpu9250_dmp_read_all(gs_accel_raw, gs_accel_g,
+                             gs_gyro_raw, gs_gyro_dps,
+                             gs_quat,
+                             gs_pitch, gs_roll, gs_yaw,
+                             &len);
+
+        mpu9250_interface_debug_print("fifo %d.\n", len);
+        mpu9250_interface_debug_print("pitch[0] is %0.2fdps.\n", gs_pitch[0]);
+        mpu9250_interface_debug_print("roll[0] is %0.2fdps.\n", gs_roll[0]);
+        mpu9250_interface_debug_print("yaw[0] is %0.2fdps.\n", gs_yaw[0]);
+        mpu9250_interface_debug_print("acc x[0] is %0.2fg.\n", gs_accel_g[0][0]);
+        mpu9250_interface_debug_print("acc y[0] is %0.2fg.\n", gs_accel_g[0][1]);
+        mpu9250_interface_debug_print("acc z[0] is %0.2fg.\n", gs_accel_g[0][2]);
+        mpu9250_interface_debug_print("gyro x[0] is %0.2fdps.\n", gs_gyro_dps[0][0]);
+        mpu9250_interface_debug_print("gyro y[0] is %0.2fdps.\n", gs_gyro_dps[0][1]);
+        mpu9250_interface_debug_print("gyro z[0] is %0.2fdps.\n", gs_gyro_dps[0][2]);
 
         // mpu_pitch_dashboard->SetMsgValue(gs_pitch[0]);
         // mpu_roll_dashboard->SetMsgValue(gs_roll[0]);
