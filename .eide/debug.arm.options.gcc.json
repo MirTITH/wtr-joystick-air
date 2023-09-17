@@ -22,6 +22,6 @@
     "linker": {
         "output-format": "elf",
         "remove-unused-input-sections": true,
-        "LIB_FLAGS": "-lm -lstdc++"
+        "LIB_FLAGS": "-lm -lstdc++ -llibmplmpu"
     }
 }

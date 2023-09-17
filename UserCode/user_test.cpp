@@ -1,7 +1,6 @@
 #include "user_test.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "driver_mpu9250_basic.h"
 #include "adc.h"
 #include "lvgl_thread.h"
 #include "lvgl/lvgl.h"
@@ -18,47 +17,208 @@
 #include "TouchScreen/GT911/gt911_define.hpp"
 #include "Button/buttons.h"
 
-#define Led_Pin  GPIO_PIN_1
-#define Led_Port GPIOA
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "inv_mpu.h"
+#include "inv_mpu_dmp_motion_driver.h"
+#include "invensense.h"
+#include "invensense_adv.h"
+#include "eMPL_outputs.h"
+#include "mltypes.h"
+// #include "mpu.h"
+// #include "log.h"
+// #include "mpumpl/driver/stm32L/packet.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 using namespace std;
 
-// static TickType_t last_3_points_time = 0;
+#define DEFAULT_MPU_HZ  (100) // 100Hz
+#define COMPASS_READ_MS (100)
 
-static void a_receive_callback(uint8_t type)
+// 陀螺仪方向设置
+static signed char gyro_orientation[9] = {1, 0, 0,
+                                          0, 1, 0,
+                                          0, 0, 1};
+// 磁力计方向设置
+static signed char comp_orientation[9] = {0, 1, 0,
+                                          1, 0, 0,
+                                          0, 0, -1};
+
+/**
+ * @brief 9250自测试
+ *
+ * @return 0则正常
+ */
+uint8_t run_self_test(void)
 {
-    switch (type) {
-        case MPU9250_INTERRUPT_MOTION: {
-            mpu9250_interface_debug_print("mpu9250: irq motion.\n");
+    int result;
+    // char test_packet[4] = {0};
+    long gyro[3], accel[3];
+    result = mpu_run_6500_self_test(gyro, accel, 0);
+    if (result == 0x7) {
+        /* Test passed. We can trust the gyro data here, so let's push it down
+         * to the DMP.
+         */
+        unsigned short accel_sens;
+        float gyro_sens;
 
-            break;
-        }
-        case MPU9250_INTERRUPT_FIFO_OVERFLOW: {
-            mpu9250_interface_debug_print("mpu9250: irq fifo overflow.\n");
+        mpu_get_gyro_sens(&gyro_sens);
+        gyro[0] = (long)(gyro[0] * gyro_sens);
+        gyro[1] = (long)(gyro[1] * gyro_sens);
+        gyro[2] = (long)(gyro[2] * gyro_sens);
+        // inv_set_gyro_bias(gyro, 3);
+        dmp_set_gyro_bias(gyro);
+        mpu_get_accel_sens(&accel_sens);
+        accel[0] *= accel_sens;
+        accel[1] *= accel_sens;
+        accel[2] *= accel_sens;
+        // inv_set_accel_bias(accel, 3);
+        dmp_set_accel_bias(accel);
+        return 0;
+    } else
+        return 1;
+}
 
-            break;
-        }
-        case MPU9250_INTERRUPT_FSYNC_INT: {
-            mpu9250_interface_debug_print("mpu9250: irq fsync int.\n");
+uint8_t MPU9250_MPL_Init(void)
+{
+    uint8_t res = 0;
+    struct int_param_s int_param;
+    uint8_t accel_fsr;
+    uint16_t gyro_rate, gyro_fsr;
+    uint16_t compass_fsr;
 
-            break;
-        }
-        case MPU9250_INTERRUPT_DMP: {
-            mpu9250_interface_debug_print("mpu9250: irq dmp\n");
+    if (!mpu_init(&int_param)) {
+        res = inv_init_mpl(); // 初始化MPL
+        if (res)
+            return 1;
+        inv_enable_quaternion();
+        inv_enable_9x_sensor_fusion();
+        inv_enable_fast_nomot();
+        inv_enable_gyro_tc();
+        inv_enable_vector_compass_cal();
+        inv_enable_magnetic_disturbance();
+        inv_enable_eMPL_outputs();
+        res = inv_start_mpl(); // 开启MPL
+        if (res)
+            return 1;
+        printf("mpl start OK!\n");
+        res = mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL | INV_XYZ_COMPASS); // 设置所需要的传感器
+        if (res)
+            return 2;
+        printf("sensor set OK!\n");
+        res = mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL); // 设置FIFO
+        if (res)
+            return 3;
+        printf("FIFO set OK!\n");
+        res = mpu_set_sample_rate(DEFAULT_MPU_HZ); // 设置采样率//宏定义在头文件COMPASS_READ_MS
+        if (res)
+            return 4;
+        printf("Sample Rate set OK!\n");
+        res = mpu_set_compass_sample_rate(1000 / COMPASS_READ_MS); // 设置磁力计采样率
+        if (res)
+            return 5;
+        printf("Compass_Sample_Rate set OK!\n");
+        mpu_get_sample_rate(&gyro_rate);
+        mpu_get_gyro_fsr(&gyro_fsr);
+        mpu_get_accel_fsr(&accel_fsr);
+        mpu_get_compass_fsr(&compass_fsr);
+        inv_set_gyro_sample_rate(1000000L / gyro_rate);
+        inv_set_accel_sample_rate(1000000L / gyro_rate);
+        inv_set_compass_sample_rate(COMPASS_READ_MS * 1000L); // 宏定义在头文件COMPASS_READ_MS
+        inv_set_gyro_orientation_and_scale(
+            inv_orientation_matrix_to_scalar(gyro_orientation), (long)gyro_fsr << 15);
+        inv_set_accel_orientation_and_scale(
+            inv_orientation_matrix_to_scalar(gyro_orientation), (long)accel_fsr << 15);
+        inv_set_compass_orientation_and_scale(
+            inv_orientation_matrix_to_scalar(comp_orientation), (long)compass_fsr << 15);
 
-            break;
-        }
-        case MPU9250_INTERRUPT_DATA_READY: {
-            mpu9250_interface_debug_print("mpu9250: irq data ready\n");
+        res = dmp_load_motion_driver_firmware(); // 加载dmp固件
+        if (res)
+            return 6;
+        printf("DMP load OK!\n");
+        res = dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation)); // 设置陀螺仪方向
+        if (res)
+            return 7;
+        printf("DMP set orientation OK!\n");
+        res = dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP | // 设置dmp功能
+                                 DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
+                                 DMP_FEATURE_GYRO_CAL);
+        if (res)
+            return 8;
+        printf("DMP feature set OK!\n");
+        res = dmp_set_fifo_rate(DEFAULT_MPU_HZ); // 设置DMP输出速率(最大不超过200Hz)
+        if (res)
+            return 9;
+        printf("DMP output rate set OK!\n");
+        res = run_self_test(); // 自检
+        if (res)
+            return 10;
+        printf("self test OK!\n");
+        res = mpu_set_dmp_state(1); // 使能DMP
+        if (res)
+            return 11;
+        printf("DMP enabled\n");
+        return 0;
+    } else
+        return 1;
+}
 
-            break;
-        }
-        default: {
-            mpu9250_interface_debug_print("mpu9250: irq unknown code.\n");
+/**
+ * @brief 获取MPL处理后的数据
+ *
+ * @param ptich 俯仰角 精度0.1 范围 -90<-->90
+ * @param roll 	横滚角 精度0.1 范围-180<-->180
+ * @param yaw 	航向角 精度0.1 范围-180<-->180
+ * @return 0则正常，其他则失败
+ */
+uint8_t MPU9250_MPL_getData(float *pitch, float *roll, float *yaw)
+{
+    unsigned long sensor_timestamp;
+    inv_time_t timestamp;
+    short gyro[3], accel_short[3], compass_short[3], sensors;
+    unsigned char more;
+    long compass[3], accel[3], quat[4], temperature;
+    long data[9];
+    int8_t accuracy;
 
-            break;
-        }
+    // q30，q16格式,long转float时的除数.
+    // static const float q30 = 1073741824.0f;
+    static const float q16 = 65536.0f;
+
+    if (dmp_read_fifo(gyro, accel_short, quat, &sensor_timestamp, &sensors, &more))
+        return 1;
+
+    if (sensors & INV_XYZ_GYRO) {
+        inv_build_gyro(gyro, sensor_timestamp); // 把新数据发送给MPL
+        mpu_get_temperature(&temperature, &sensor_timestamp);
+        inv_build_temp(temperature, sensor_timestamp); // 把温度值发给MPL，只有陀螺仪需要温度值
     }
+
+    if (sensors & INV_XYZ_ACCEL) {
+        accel[0] = (long)accel_short[0];
+        accel[1] = (long)accel_short[1];
+        accel[2] = (long)accel_short[2];
+        inv_build_accel(accel, 0, sensor_timestamp); // 把加速度值发给MPL
+    }
+
+    if (!mpu_get_compass_reg(compass_short, &sensor_timestamp)) {
+        compass[0] = (long)compass_short[0];
+        compass[1] = (long)compass_short[1];
+        compass[2] = (long)compass_short[2];
+        inv_build_compass(compass, 0, sensor_timestamp); // 把磁力计值发给MPL
+    }
+    inv_execute_on_data();
+    inv_get_sensor_type_euler(data, &accuracy, &timestamp);
+
+    *roll  = (data[0] / q16);
+    *pitch = -(data[1] / q16);
+    *yaw   = -data[2] / q16;
+    return 0;
 }
 
 void TestThreadEntry(void *argument)
@@ -66,85 +226,24 @@ void TestThreadEntry(void *argument)
     (void)argument;
 
     // auto joystickl_dashboard = dashboard_mgr.NewDashboard(250, "JoystickL");
-    // auto joystickr_dashboard = dashboard_mgr.NewDashboard(251, "JoystickR");
-    // auto encoder_dashboard   = dashboard_mgr.NewDashboard(252, "Encoder");
-    // auto button_dashboard    = dashboard_mgr.NewDashboard(253, "Buttons(0-10 bit)");
-    // auto button2_dashboard   = dashboard_mgr.NewDashboard(254, "Buttons(11-21 bit)");
-    // auto mpu_result_dashboard = dashboard_mgr.NewDashboard(100, "MPU9250 result");
-    // auto mpu_g_dashboard      = dashboard_mgr.NewDashboard(101, "MPU9250 g");
-    // auto mpu_dps_dashboard    = dashboard_mgr.NewDashboard(102, "MPU9250 dps");
-    // auto mpu_ut_dashboard     = dashboard_mgr.NewDashboard(103, "MPU9250 ut");
-    // auto mpu_temp_dashboard   = dashboard_mgr.NewDashboard(104, "MPU9250 temp");
-    // auto mpu_pitch_dashboard = dashboard_mgr.NewDashboard(105, "MPU9250 pitch");
-    // auto mpu_roll_dashboard  = dashboard_mgr.NewDashboard(106, "MPU9250 roll");
-    // auto mpu_yaw_dashboard   = dashboard_mgr.NewDashboard(107, "MPU9250 yaw");
 
     stringstream sstr;
     sstr.precision(2);
     sstr.setf(std::ios::fixed);
 
+    printf("Start MPU9250_MPL_Init\n");
+    int result = MPU9250_MPL_Init();
+    printf("MPU9250_MPL_Init: %d\n", result);
+    vTaskDelay(1000);
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
-    // extern volatile uint32_t MavTotalBytesSent;
-    // extern volatile uint32_t MavTotalBytesGot;
-
-    // float g[3]{};
-    // float dps[3]{};
-    // float ut[3]{};
-    // float temperature = 0;
-
     while (true) {
-        // time_dashboard->SetMsg(xTaskGetTickCount() / 1000.0);
-        // Buttons_Scan();
-
-        // mpu_pitch_dashboard->SetMsgValue(gs_pitch[0]);
-        // mpu_roll_dashboard->SetMsgValue(gs_roll[0]);
-        // mpu_yaw_dashboard->SetMsgValue(gs_yaw[0]);
-
-        // sstr.str("");
-        // sstr << gs_accel_g[0] << "," << gs_accel_g[1] << "," << gs_accel_g[2];
-        // mpu_g_dashboard->SetMsg(sstr.str());
-
-        // sstr.str("");
-        // sstr << dps[0] << "," << dps[1] << "," << dps[2];
-        // mpu_dps_dashboard->SetMsg(sstr.str());
-
-        // sstr.str("");
-        // sstr << ut[0] << "," << ut[1] << "," << ut[2];
-        // mpu_ut_dashboard->SetMsg(sstr.str());
-
-        // mpu9250_basic_read_temperature(&temperature);
-        // mpu_temp_dashboard->SetMsgValue(temperature);
-
-        // sstr << JoystickL.Pos().x << "," << JoystickL.Pos().y;
-        // joystickl_dashboard->SetMsg(sstr.str());
-        // sstr.str("");
-        // sstr << JoystickR.Pos().x << "," << JoystickR.Pos().y;
-        // joystickr_dashboard->SetMsg(sstr.str());
-        // sstr.str("");
-        // sstr << KnobEncoderL.Count() << "," << KnobEncoderR.Count();
-        // encoder_dashboard->SetMsg(sstr.str());
-
-        // sstr.str("");
-        // for (size_t i = 1; i <= 11; i++) {
-        //     sstr << (int)Buttons_Read(i);
-        // }
-        // button_dashboard->SetMsg(sstr.str());
-
-        // sstr.str("");
-        // for (size_t i = 12; i <= 22; i++) {
-        //     sstr << (int)Buttons_Read(i);
-        // }
-        // button2_dashboard->SetMsg(sstr.str());
-
-        // if (TouchScreen.NumberOfTouchPoint() == 3) {
-        //     if (xTaskGetTickCount() - last_3_points_time > 500) {
-        //         MainWindow.SwitchToPage(0);
-        //     }
-        //     last_3_points_time = xTaskGetTickCount();
-        // }
-
-        vTaskDelayUntil(&PreviousWakeTime, 100);
+        float pitch, roll, yaw;
+        if (!MPU9250_MPL_getData(&pitch, &roll, &yaw))
+            printf("%f,%f,%f\n", pitch, yaw, roll);
+        else
+            printf("error:cannot get data\n");
+        vTaskDelayUntil(&PreviousWakeTime, 10);
     }
 }

@@ -107,16 +107,24 @@
           "UserCode/Lib",
           "UserCode/Lib/System",
           "UserCode/Lib/lvgl",
-          "UserCode/Lib/mpu9250/example",
-          "UserCode/Lib/mpu9250/interface",
-          "UserCode/Lib/mpu9250/src"
+          "UserCode/Lib/mpumpl/driver/include",
+          "UserCode/Lib/mpumpl/mllite",
+          "UserCode/Lib/mpumpl/driver/eMPL",
+          "UserCode/Lib/mpumpl/mpl",
+          "UserCode/Lib/mpumpl/eMPL-hal"
         ],
-        "libList": [],
+        "libList": [
+          "UserCode/Lib/mpumpl/mpl"
+        ],
         "sourceDirList": [],
         "defineList": [
           "USE_HAL_DRIVER",
           "STM32H743xx",
-          "STM32_THREAD_SAFE_STRATEGY=4"
+          "STM32_THREAD_SAFE_STRATEGY=4",
+          "MPU9250",
+          "EMPL_TARGET_STM32F4",
+          "EMPL",
+          "MPL_LOG_NDEBUG=1"
         ]
       }
     }
