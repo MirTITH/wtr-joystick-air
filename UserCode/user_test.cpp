@@ -350,8 +350,9 @@ void MpuLoop()
     // printf("%f,%f,%f,%d,%d,%d,%d,%d\n", pitch, yaw, roll, accuracy,
     //        count_xyz_gyro, count_xyz_accel, count_wxyz_quat, count_compass);
 
-    inv_get_sensor_type_quat(data, &accuracy, &timestamp);
-    printf("%f,%f,%f,%f,%d,%d,%lu\n", data[0] / q30, data[1] / q30, data[2] / q30, data[3] / q30, accuracy, more, kMpuIntCount);
+    // inv_get_sensor_type_quat(data, &accuracy, &timestamp);
+    // printf("%f,%f,%f,%f,%d,%d,%lu\n", data[0] / q30, data[1] / q30, data[2] / q30, data[3] / q30, accuracy, more, kMpuIntCount);
+    printf("%f,%f,%f,%f\n", quat[0] / q30, quat[1] / q30, quat[2] / q30, quat[3] / q30);
 }
 
 void TestThreadEntry(void *argument)
