@@ -124,7 +124,8 @@
           "MPU9250",
           "EMPL_TARGET_STM32F4",
           "EMPL",
-          "MPL_LOG_NDEBUG=1"
+          "MPL_LOG_NDEBUG=1",
+          "USE_DMP"
         ]
       }
     }
