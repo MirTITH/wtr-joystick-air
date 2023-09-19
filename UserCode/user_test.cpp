@@ -16,6 +16,7 @@
 #include "as69_config.hpp"
 #include "TouchScreen/GT911/gt911_define.hpp"
 #include "Button/buttons.h"
+#include "freertos_lock/freertos_lock.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +38,7 @@ extern "C" {
 
 using namespace std;
 
-#define DEFAULT_MPU_HZ  (20)
+#define DEFAULT_MPU_HZ  (200)
 #define COMPASS_READ_MS (100)
 
 // 陀螺仪方向设置
@@ -149,27 +150,23 @@ uint8_t MPU9250_MPL_Init(void)
         inv_enable_fast_nomot();
         inv_enable_gyro_tc();
         inv_enable_vector_compass_cal();
-        inv_enable_magnetic_disturbance();
+        inv_enable_in_use_auto_calibration();
+        // inv_enable_magnetic_disturbance();
         inv_enable_eMPL_outputs();
         res = inv_start_mpl(); // 开启MPL
-        if (res)
-            return 1;
+        if (res) return 1;
         printf("mpl start OK!\n");
         res = mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL | INV_XYZ_COMPASS); // 设置所需要的传感器
-        if (res)
-            return 2;
+        if (res) return 2;
         printf("sensor set OK!\n");
         res = mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL); // 设置FIFO
-        if (res)
-            return 3;
+        if (res) return 3;
         printf("FIFO set OK!\n");
         res = mpu_set_sample_rate(DEFAULT_MPU_HZ); // 设置采样率//宏定义在头文件COMPASS_READ_MS
-        if (res)
-            return 4;
+        if (res) return 4;
         printf("Sample Rate set OK!\n");
         res = mpu_set_compass_sample_rate(1000 / COMPASS_READ_MS); // 设置磁力计采样率
-        if (res)
-            return 5;
+        if (res) return 5;
         printf("Compass_Sample_Rate set OK!\n");
         mpu_get_sample_rate(&gyro_rate);
         mpu_get_gyro_fsr(&gyro_fsr);
@@ -193,22 +190,24 @@ uint8_t MPU9250_MPL_Init(void)
         dmp_register_tap_cb(tap_cb);
         dmp_register_android_orient_cb(android_orient_cb);
 
-        // res = dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
-        //                          DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
-        //                          DMP_FEATURE_GYRO_CAL);
         res = dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
-                                 DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_GYRO_CAL);
-        if (res)
-            return 8;
+                                 DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
+                                 DMP_FEATURE_GYRO_CAL);
+        // res = dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT |
+        //                          DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_GYRO_CAL);
+        if (res) return 8;
         printf("DMP feature set OK!\n");
         res = dmp_set_fifo_rate(DEFAULT_MPU_HZ); // 设置DMP输出速率(最大不超过200Hz)
         if (res)
             return 9;
         printf("DMP output rate set OK!\n");
 
-        // res = run_self_test(); // 自检
-        // if (res) return 10;
-        // printf("self test OK!\n");
+        res = run_self_test(); // 自检
+        if (res) {
+            printf("Self test failed! Make sure the device face up\n");
+            return 10;
+        }
+        printf("self test OK!\n");
 
         res = mpu_set_dmp_state(1); // 使能DMP
         if (res)
@@ -276,6 +275,15 @@ uint8_t MPU9250_MPL_getData(float *pitch, float *roll, float *yaw)
     return 0;
 }
 
+freertos_lock::BinarySemphr kMpuSem;
+uint32_t kMpuIntCount = 0;
+
+void MpuInt()
+{
+    kMpuIntCount++;
+    kMpuSem.unlock_from_isr();
+}
+
 void MpuLoop()
 {
     unsigned long sensor_timestamp;
@@ -287,45 +295,63 @@ void MpuLoop()
     int8_t accuracy;
 
     // q30，q16格式,long转float时的除数.
-    // static const float q30 = 1073741824.0f;
+    static const float q30 = 1073741824.0f;
     static const float q16 = 65536.0f;
 
     if (dmp_read_fifo(gyro, accel_short, quat, &sensor_timestamp, &sensors, &more)) {
         return;
     }
 
+    static int count_xyz_gyro = 0;
     if (sensors & INV_XYZ_GYRO) {
+        count_xyz_gyro++;
         inv_build_gyro(gyro, sensor_timestamp); // 把新数据发送给MPL
         mpu_get_temperature(&temperature, &sensor_timestamp);
         inv_build_temp(temperature, sensor_timestamp); // 把温度值发给MPL，只有陀螺仪需要温度值
     }
 
+    static int count_xyz_accel = 0;
     if (sensors & INV_XYZ_ACCEL) {
+        count_xyz_accel++;
         accel[0] = (long)accel_short[0];
         accel[1] = (long)accel_short[1];
         accel[2] = (long)accel_short[2];
         inv_build_accel(accel, 0, sensor_timestamp); // 把加速度值发给MPL
     }
 
+    static int count_wxyz_quat = 0;
     if (sensors & INV_WXYZ_QUAT) {
+        count_wxyz_quat++;
         inv_build_quat(quat, 0, sensor_timestamp);
     }
 
-    if (!mpu_get_compass_reg(compass_short, &sensor_timestamp)) {
-        compass[0] = (long)compass_short[0];
-        compass[1] = (long)compass_short[1];
-        compass[2] = (long)compass_short[2];
-        inv_build_compass(compass, 0, sensor_timestamp); // 把磁力计值发给MPL
+    static int count_compass        = 0;
+    static uint32_t next_compass_ms = HAL_GetTick();
+    if (HAL_GetTick() > next_compass_ms) {
+        if (!mpu_get_compass_reg(compass_short, &sensor_timestamp)) {
+            next_compass_ms += 100;
+            count_compass++;
+            compass[0] = (long)compass_short[0];
+            compass[1] = (long)compass_short[1];
+            compass[2] = (long)compass_short[2];
+            inv_build_compass(compass, 0, sensor_timestamp); // 把磁力计值发给MPL
+        }
     }
+
     inv_execute_on_data();
-    inv_get_sensor_type_euler(data, &accuracy, &timestamp);
+
+    // inv_get_sensor_type_euler(data, &accuracy, &timestamp);
     // inv_get_sensor_type_quat
 
-    float roll  = (data[0] / q16);
-    float pitch = -(data[1] / q16);
-    float yaw   = -data[2] / q16;
+    // float roll  = (data[0] / q16);
+    // float pitch = -(data[1] / q16);
+    // float yaw   = -data[2] / q16;
 
-    printf("%f,%f,%f,%d,%d\n", pitch, yaw, roll, accuracy, more);
+    // printf("%f,%f,%f,%d,%d,%d,%d,%d\n", pitch, yaw, roll, accuracy,
+    //        count_xyz_gyro, count_xyz_accel, count_wxyz_quat, count_compass);
+
+    inv_get_sensor_type_quat(data, &accuracy, &timestamp);
+    printf("%f,%f,%f,%f,%d,%d,%lu\n", data[0] / q30, data[1] / q30, data[2] / q30, data[3] / q30, accuracy, more, kMpuIntCount);
 }
 
 void TestThreadEntry(void *argument)
@@ -341,7 +367,7 @@ void TestThreadEntry(void *argument)
     printf("Start MPU9250_MPL_Init\n");
     int result = MPU9250_MPL_Init();
     printf("MPU9250_MPL_Init: %d\n", result);
-    vTaskDelay(1000);
+    // vTaskDelay(1000);
 
     uint32_t PreviousWakeTime = xTaskGetTickCount();
 
@@ -351,8 +377,9 @@ void TestThreadEntry(void *argument)
         //     printf("%f,%f,%f\n", pitch, yaw, roll);
         // else
         //     printf("error:cannot get data\n");
+        kMpuSem.lock();
         MpuLoop();
-        vTaskDelay(10);
+        // vTaskDelay(10);
         // vTaskDelayUntil(&PreviousWakeTime, 25);
     }
 }

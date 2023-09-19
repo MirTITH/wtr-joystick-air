@@ -56,6 +56,7 @@ void EXTI0_IRQHandler(void);
 void EXTI3_IRQHandler(void);
 void EXTI9_5_IRQHandler(void);
 void USART1_IRQHandler(void);
+void EXTI15_10_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void OTG_FS_IRQHandler(void);
 void MDMA_IRQHandler(void);

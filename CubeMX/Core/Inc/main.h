@@ -107,6 +107,7 @@ void Error_Handler(void);
 #define MPU9250_EDa_GPIO_Port GPIOB
 #define MPU9250_Int_Pin GPIO_PIN_12
 #define MPU9250_Int_GPIO_Port GPIOB
+#define MPU9250_Int_EXTI_IRQn EXTI15_10_IRQn
 #define AS69_MD1_Pin GPIO_PIN_13
 #define AS69_MD1_GPIO_Port GPIOB
 #define AS69_Tx_Pin GPIO_PIN_14

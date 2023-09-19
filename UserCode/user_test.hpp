@@ -8,6 +8,8 @@ void TestThreadEntry(void *argument);
 extern "C" {
 #endif
 
+void MpuInt();
+
 #ifdef __cplusplus
 }
 #endif
