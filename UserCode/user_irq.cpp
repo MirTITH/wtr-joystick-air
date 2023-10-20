@@ -6,6 +6,7 @@
 #include "Mavlink/wtr_mavlink.h"
 #include "freertos_io/uart_device.hpp"
 #include "user_test.hpp"
+#include "mpumpl/mpumpl.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,7 +70,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
             KnobEncoderR.ExtiCallback();
             break;
         case MPU9250_Int_Pin:
-            MpuInt();
+            Mpu_InterruptCallback();
             break;
 
         default:

@@ -9,6 +9,7 @@
         "C_Cpp.default.configurationProvider": "cl.eide",
         "C_Cpp.errorSquiggles": "disabled",
         "files.associations": {
+            "*.m": "matlab",
             ".eideignore": "ignore",
             "*.a51": "a51",
             "*.h": "c",
@@ -77,7 +78,8 @@
             "condition_variable": "cpp",
             "mutex": "cpp",
             "stop_token": "cpp",
-            "thread": "cpp"
+            "thread": "cpp",
+            "semaphore": "cpp"
         },
         "[yaml]": {
             "editor.insertSpaces": true,
